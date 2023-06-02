@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>2645011081</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\hal\include\hal_hwdef.h</file>
+      <file>$PROJ_DIR$\hal\src\hal_spi.c</file>
+      <file>$PROJ_DIR$\hal\include\hal_gpio.h</file>
+      <file>$PROJ_DIR$\hal\include\hal_spi.h</file>
+      <file>$PROJ_DIR$\hal\src\hal_clk.c</file>
+      <file>$PROJ_DIR$\hal\include\hal_clk.h</file>
+      <file>$PROJ_DIR$\hal\src\hal_timer.c</file>
+      <file>$PROJ_DIR$\hal\include\hal_timer.h</file>
+      <file>$PROJ_DIR$\hal\target\f149\hal_hwdef_f149.h</file>
+      <file>$PROJ_DIR$\hal\include\hal.h</file>
+      <file>$PROJ_DIR$\lib\cc1101\include\CC1100-CC2500.h</file>
+      <file>$PROJ_DIR$\lib\cc1101\include\cc1101.h</file>
+      <file>$PROJ_DIR$\lib\cc1101\include\TI_CC_hardware_board_EXP5438.h</file>
+      <file>$PROJ_DIR$\lib\cc1101\include\TI_CC_CC1100-CC2500.h</file>
+      <file>$PROJ_DIR$\lib\cc1101\include\TI_CC_msp430.h</file>
+      <file>$PROJ_DIR$\lib\cc1101\include\TI_CC_spi.h</file>
+      <file>$PROJ_DIR$\lib\cc1101\src\CC1100-CC2500.c</file>
+      <file>$PROJ_DIR$\lib\cc1101\src\main.c</file>
+      <file>$PROJ_DIR$\lib\cc1101\src\TI_CC_spi.c</file>
+      <file>$PROJ_DIR$\lib\src\delay.c</file>
+      <file>$PROJ_DIR$\lib\include\delay.h</file>
+      <file>$PROJ_DIR$\lib\src\ps2.c</file>
+      <file>$PROJ_DIR$\lib\include\ps2.h</file>
+      <file>$PROJ_DIR$\files.txt</file>
+      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\main.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_timer.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\delay.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_timer.pbi</file>
+      <file>$PROJ_DIR$\Debug\Exe\cc1101-ps2.d43</file>
+      <file>$PROJ_DIR$\Debug\Exe\cc1101-ps2.ulp</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_clk.pbi</file>
+      <file>$TOOLKIT_DIR$\config\linker\lnk430f149.xcl</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_clk.r43</file>
+      <file>$TOOLKIT_DIR$\inc\io430f149.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\cc1101-ps2.pbd</file>
+      <file>$TOOLKIT_DIR$\inc\io430.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_spi.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_spi.r43</file>
+      <file>$PROJ_DIR$\Debug\List\cc1101-ps2.map</file>
+      <file>$TOOLKIT_DIR$\config\linker\multiplier.xcl</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dl430fn.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.__cstat.et</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_spi.__cstat.et</file>
+      <file>$PROJ_DIR$\Debug\Obj\delay.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_timer.__cstat.et</file>
+      <file>$PROJ_DIR$\Debug\Obj\TI_CC_spi.__cstat.et</file>
+      <file>$PROJ_DIR$\Debug\Obj\CC1100-CC2500.__cstat.et</file>
+      <file>$PROJ_DIR$\Debug\Obj\delay.__cstat.et</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_clk.__cstat.et</file>
+      <file>$PROJ_DIR$\Debug\Obj\CC1100-CC2500.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\TI_CC_spi.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\TI_CC_spi.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\CC1100-CC2500.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ps2.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\ps2.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\delay.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\ps2.__cstat.et</file>
+      <file>$PROJ_DIR$\Debug\List\main.lst</file>
+      <file>$PROJ_DIR$\Debug\List\ps2.s43</file>
+      <file>$PROJ_DIR$\Debug\List\hal_spi.lst</file>
+      <file>$PROJ_DIR$\Debug\List\hal_spi.s43</file>
+      <file>$PROJ_DIR$\Debug\List\TI_CC_spi.lst</file>
+      <file>$PROJ_DIR$\Debug\List\hal_timer.s43</file>
+      <file>$PROJ_DIR$\Debug\List\hal_timer.lst</file>
+      <file>$PROJ_DIR$\Debug\List\ps2.lst</file>
+      <file>$PROJ_DIR$\Debug\List\TI_CC_spi.s43</file>
+      <file>$PROJ_DIR$\Debug\List\main.s43</file>
+      <file>$PROJ_DIR$\Debug\List\hal_clk.s43</file>
+      <file>$PROJ_DIR$\Debug\List\hal_clk.lst</file>
+      <file>$PROJ_DIR$\Debug\List\delay.s43</file>
+      <file>$PROJ_DIR$\Debug\List\CC1100-CC2500.lst</file>
+      <file>$PROJ_DIR$\Debug\List\CC1100-CC2500.s43</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 29 42</file>
+        </tool>
+        <tool>
+          <name>ULP430</name>
+          <file> 30</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\hal\src\hal_spi.c</name>
+      <outputs>
+        <tool>
+          <name>__cstat</name>
+          <file> 46</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 64 63 41</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 0 8 38 36 39 3 2</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 39 38 8 36 0 3 2</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\hal\src\hal_clk.c</name>
+      <outputs>
+        <tool>
+          <name>__cstat</name>
+          <file> 52</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 71 72 35</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 5 0 8 38 36 39</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38 39 0 8 36 5</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\hal\src\hal_timer.c</name>
+      <outputs>
+        <tool>
+          <name>__cstat</name>
+          <file> 48</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 66 67 26</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 7 0 8 38 36 39</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38 39 0 8 36 7</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\cc1101\src\CC1100-CC2500.c</name>
+      <outputs>
+        <tool>
+          <name>__cstat</name>
+          <file> 50</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 75 74 53</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 56</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 11 13 15 10 14 12 38 36 39</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 10 13 12 39 11 15 14 38 36</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\cc1101\src\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 31</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 32</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\cc1101\src\TI_CC_spi.c</name>
+      <outputs>
+        <tool>
+          <name>__cstat</name>
+          <file> 49</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 69 65 54</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 11 13 15 10 14 12 38 36 39</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14 15 13 10 12 39 11 38 36</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\src\delay.c</name>
+      <outputs>
+        <tool>
+          <name>__cstat</name>
+          <file> 51</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 73 59 47</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 20 0 8 38 36 39 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38 0 39 8 36 20 7</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\src\ps2.c</name>
+      <outputs>
+        <tool>
+          <name>__cstat</name>
+          <file> 60</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 62 68 57</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 58</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 22 2 38 36 39 3 7 20 0 8</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 39 38 2 36 22 3 7 20 0 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>__cstat</name>
+          <file> 45</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 70 61 31</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 32</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC430</name>
+          <file> 25 9 2 38 36 39 3 7 5 20 0 8 11 13 15 10 14 12 22</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 10 7 22 36 20 2 38 0 13 12 25 9 11 3 5 39 8 15 14</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\cc1101-ps2.d43</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 42</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 34 43 53 47 35 41 26 31 57 54 44</file>
+        </tool>
+      </inputs>
+    </file>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\lib\cc1101\src\main.c</name>
+      <tool>C-STAT</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\lib\cc1101\src\main.c</name>
+      <tool>ICC430</tool>
+    </forcedrebuild>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs/>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>XLINK</tool>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+

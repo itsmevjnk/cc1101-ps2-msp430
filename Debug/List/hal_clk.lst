@@ -1,0 +1,120 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V6.40.1.950/W32 for MSP430           10/Sep/2022  21:37:38
+# Copyright 1996-2015 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+#
+#    __rt_version  =  3
+#    __double_size =  32
+#    __reg_r4      =  free
+#    __reg_r5      =  free
+#    __pic         =  no
+#    __core        =  430
+#    Source file   =  Y:\Dev\cc1101-ps2\hal\src\hal_clk.c
+#    Command line  =  
+#        Y:\Dev\cc1101-ps2\hal\src\hal_clk.c -D HAL_HW_F149 -lC
+#        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+#        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+#        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+#        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+#        __data16=DATA16 --segment __data20=DATA20
+#    List file     =  Y:\Dev\cc1101-ps2\Debug\List\hal_clk.lst
+#    Object file   =  Y:\Dev\cc1101-ps2\Debug\Obj\hal_clk.r43
+#
+###############################################################################
+
+Y:\Dev\cc1101-ps2\hal\src\hal_clk.c
+      1          #include "hal_clk.h"
+      2          #include "hal_hwdef.h"
+
+   \                                 In  segment DATA16_AN, at 0x2
+   \   union <unnamed> volatile _A_IFG1
+   \                     _A_IFG1:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x120
+   \   union <unnamed> volatile _A_WDTCTL
+   \                     _A_WDTCTL:
+   \   000000                DS8 2
+
+   \                                 In  segment DATA16_AN, at 0x57
+   \   union <unnamed> volatile _A_BCSCTL1
+   \                     _A_BCSCTL1:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x58
+   \   union <unnamed> volatile _A_BCSCTL2
+   \                     _A_BCSCTL2:
+   \   000000                DS8 1
+      3          
+      4          #if defined HAL_CLK_BASIC
+      5          
+
+   \                                 In  segment CODE, align 2
+      6          void hal_clk_init(void) {
+   \                     hal_clk_init:
+      7            WDTCTL = WDTPW + WDTHOLD; // Stop watchdog timer
+   \   000000   B240805A2001 MOV.W   #0x5a80, &0x120
+      8            
+      9            BCSCTL1 = 0; // enable XT2
+   \   000006   C2435700     MOV.B   #0x0, &0x57
+     10            
+     11            /* wait until crystal is ready to go (no OSCFault) */
+     12            do {
+     13              IFG1 &= ~OFIFG;
+   \                     ??hal_clk_init_1:
+   \   00000A   E2C30200     BIC.B   #0x2, &0x2
+     14              for(unsigned char i = 0xFF; i > 0; i--);
+   \   00000E   7E43         MOV.B   #0xff, R14
+   \   000010   013C         JMP     ??hal_clk_init_2
+   \                     ??hal_clk_init_0:
+   \   000012   7E53         ADD.B   #0xff, R14
+   \                     ??hal_clk_init_2:
+   \   000014   4E93         CMP.B   #0x0, R14
+   \   000016   FD23         JNE     ??hal_clk_init_0
+     15            } while(IFG1 & OFIFG);
+   \   000018   E2B30200     BIT.B   #0x2, &0x2
+   \   00001C   F62F         JC      ??hal_clk_init_1
+     16            
+     17            BCSCTL2 = 0x88; // MCLK = SMCLK = XT2CLK, SMCLK/1, DCO internal resistor
+   \   00001E   F24088005800 MOV.B   #0x88, &0x58
+     18          }
+   \   000024   3041         RET
+   \   000026                REQUIRE _A_WDTCTL
+   \   000026                REQUIRE _A_BCSCTL1
+   \   000026                REQUIRE _A_IFG1
+   \   000026                REQUIRE _A_BCSCTL2
+     19          
+     20          #else
+     21          #error "No system clock module type defined"
+     22          #endif
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      2   hal_clk_init
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       1  _A_BCSCTL1
+       1  _A_BCSCTL2
+       1  _A_IFG1
+       2  _A_WDTCTL
+      38  hal_clk_init
+
+ 
+ 38 bytes in segment CODE
+  5 bytes in segment DATA16_AN
+ 
+ 38 bytes of CODE memory
+  0 bytes of DATA memory (+ 5 bytes shared)
+
+Errors: none
+Warnings: none

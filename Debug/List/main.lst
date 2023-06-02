@@ -1,0 +1,452 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V6.40.1.950/W32 for MSP430           10/Sep/2022  21:37:38
+# Copyright 1996-2015 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+#
+#    __rt_version  =  3
+#    __double_size =  32
+#    __reg_r4      =  free
+#    __reg_r5      =  free
+#    __pic         =  no
+#    __core        =  430
+#    Source file   =  Y:\Dev\cc1101-ps2\main.c
+#    Command line  =  
+#        Y:\Dev\cc1101-ps2\main.c -D HAL_HW_F149 -lC
+#        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+#        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+#        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+#        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+#        __data16=DATA16 --segment __data20=DATA20
+#    List file     =  Y:\Dev\cc1101-ps2\Debug\List\main.lst
+#    Object file   =  Y:\Dev\cc1101-ps2\Debug\Obj\main.r43
+#
+###############################################################################
+
+Y:\Dev\cc1101-ps2\main.c
+      1          #include "main.h"
+
+   \                                 In  segment DATA16_AN, at 0x20
+   \   union <unnamed> volatile _A_P1IN
+   \                     _A_P1IN:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x23
+   \   union <unnamed> volatile _A_P1IFG
+   \                     _A_P1IFG:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x24
+   \   union <unnamed> volatile _A_P1IES
+   \                     _A_P1IES:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x25
+   \   union <unnamed> volatile _A_P1IE
+   \                     _A_P1IE:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x29
+   \   union <unnamed> volatile _A_P2OUT
+   \                     _A_P2OUT:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x2a
+   \   union <unnamed> volatile _A_P2DIR
+   \                     _A_P2DIR:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x2b
+   \   union <unnamed> volatile _A_P2IFG
+   \                     _A_P2IFG:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x2c
+   \   union <unnamed> volatile _A_P2IES
+   \                     _A_P2IES:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x2d
+   \   union <unnamed> volatile _A_P2IE
+   \                     _A_P2IE:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x30
+   \   union <unnamed> volatile _A_P5IN
+   \                     _A_P5IN:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x32
+   \   union <unnamed> volatile _A_P5DIR
+   \                     _A_P5DIR:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x33
+   \   union <unnamed> volatile _A_P5SEL
+   \                     _A_P5SEL:
+   \   000000                DS8 1
+
+  /* --COPYRIGHT--,BSD
+                     ^
+"Y:\Dev\cc1101-ps2\lib\cc1101\include\TI_CC_CC1100-CC2500.h",1  Warning[Pa050]: 
+          non-native end of line sequence detected (this diagnostic is only
+          issued once)
+      2          
+      3          extern char paTable[];
+      4          extern char paTableLen;
+      5          
+
+   \                                 In  segment DATA16_Z, align 1, align-sorted
+   \   000000                REQUIRE ?cstart_init_zero
+      6          char txBuffer[4];
+   \                     txBuffer:
+   \   000000                DS8 4
+
+   \                                 In  segment DATA16_Z, align 1, align-sorted
+   \   000000                REQUIRE ?cstart_init_zero
+      7          char rxBuffer[4];
+   \                     rxBuffer:
+   \   000000                DS8 4
+
+   \                                 In  segment DATA16_Z, align 2, align-sorted
+   \   000000                REQUIRE ?cstart_init_zero
+      8          unsigned int i;
+   \                     i:
+   \   000000                DS8 2
+      9          
+
+   \                                 In  segment CODE, align 2
+     10          void main (void)
+   \                     main:
+     11          {
+   \   000000   0A12         PUSH.W  R10
+   \   000002   0B12         PUSH.W  R11
+     12            hal_clk_init();  
+   \   000004   B012....     CALL    #hal_clk_init
+     13            hal_timer_init();
+   \   000008   B012....     CALL    #hal_timer_init
+     14            hal_spi_init();
+   \   00000C   B012....     CALL    #hal_spi_init
+     15            
+     16            ps2_init();
+   \   000010   B012....     CALL    #ps2_init
+     17            ps2_transfer(0x42); // test command to read PS2 gamepad
+   \   000014   7C404200     MOV.B   #0x42, R12
+   \   000018   B012....     CALL    #ps2_transfer
+     18            
+     19            P5SEL &= ~(BIT0+BIT1+BIT2+BIT3+BIT4+BIT5+BIT6+BIT7); //Set P5.0 to P5.7 as GPIO, functionally equiv to P5SEL = 0
+   \   00001C   5A423300     MOV.B   &0x33, R10
+   \   000020   C2433300     MOV.B   #0x0, &0x33
+     20            P5DIR &= ~(BIT0+BIT1+BIT2+BIT3+BIT4+BIT5+BIT6+BIT7); //Set P5.0 to P5.7 as input, functionally equiv to P5DIR = 0
+   \   000024   5B423200     MOV.B   &0x32, R11
+   \   000028   C2433200     MOV.B   #0x0, &0x32
+     21            
+     22          
+     23            // 5ms delay to compensate for time to startup between MSP430 and CC1100/2500
+     24            delay_ms(5);
+   \   00002C   3C400500     MOV.W   #0x5, R12
+   \   000030   B012....     CALL    #delay_ms
+     25            //__delay_cycles(5000);
+     26            TI_CC_SPISetup();                         // Initialize SPI port
+   \   000034   B012....     CALL    #TI_CC_SPISetup
+     27          
+     28            TI_CC_PowerupResetCCxxxx();               // Reset CCxxxx
+   \   000038   B012....     CALL    #TI_CC_PowerupResetCCxxxx
+     29            
+     30            
+     31            //writeRFSettings(0);                        // Write RF settings to config reg, use channel 0
+     32          
+     33          //******************************************************************************
+     34          // Freq and channel select. Bit 0 and 1 of 8bit dip switch selects freq, bit 2
+     35          // to 7 selects channel
+     36          //******************************************************************************
+     37            
+     38          switch (P5IN&3)
+   \   00003C   5E423000     MOV.B   &0x30, R14
+   \   000040   4E4E         MOV.B   R14, R14
+   \   000042   3EF00300     AND.W   #0x3, R14
+   \   000046   4E83         SUB.B   #0x0, R14
+   \   000048   0724         JEQ     ??main_0
+   \   00004A   5E83         SUB.B   #0x1, R14
+   \   00004C   0D24         JEQ     ??main_1
+   \   00004E   5E83         SUB.B   #0x1, R14
+   \   000050   1324         JEQ     ??main_2
+   \   000052   5E83         SUB.B   #0x1, R14
+   \   000054   1924         JEQ     ??main_3
+   \   000056   1F3C         JMP     ??main_4
+     39          {
+     40          	case 0:
+     41          		writeRFSettings_315(P5IN >>2);
+   \                     ??main_0:
+   \   000058   5C423000     MOV.B   &0x30, R12
+   \   00005C   12C3         CLRC
+   \   00005E   4C10         RRC.B   R12
+   \   000060   4C11         RRA.B   R12
+   \   000062   B012....     CALL    #writeRFSettings_315
+     42          		break;
+   \   000066   173C         JMP     ??main_4
+     43          	case 1:
+     44          		writeRFSettings_433(P5IN >>2);
+   \                     ??main_1:
+   \   000068   5C423000     MOV.B   &0x30, R12
+   \   00006C   12C3         CLRC
+   \   00006E   4C10         RRC.B   R12
+   \   000070   4C11         RRA.B   R12
+   \   000072   B012....     CALL    #writeRFSettings_433
+     45          		break;
+   \   000076   0F3C         JMP     ??main_4
+     46          	case 2:
+     47          		writeRFSettings_868(P5IN >>2);
+   \                     ??main_2:
+   \   000078   5C423000     MOV.B   &0x30, R12
+   \   00007C   12C3         CLRC
+   \   00007E   4C10         RRC.B   R12
+   \   000080   4C11         RRA.B   R12
+   \   000082   B012....     CALL    #writeRFSettings_868
+     48          		break;
+   \   000086   073C         JMP     ??main_4
+     49          	case 3:
+     50          		writeRFSettings_915(P5IN >>2);
+   \                     ??main_3:
+   \   000088   5C423000     MOV.B   &0x30, R12
+   \   00008C   12C3         CLRC
+   \   00008E   4C10         RRC.B   R12
+   \   000090   4C11         RRA.B   R12
+   \   000092   B012....     CALL    #writeRFSettings_915
+     51          		break;
+     52          }
+     53          
+     54            
+     55            
+     56            //TI_CC_SPIWriteBurstReg(TI_CCxxx0_PATABLE, paTable, paTableLen);//Write PATABLE
+     57          
+     58            TI_CC_SW_PxIES = TI_CC_SW1+TI_CC_SW2;//Int on falling edge
+   \                     ??main_4:
+   \   000096   F24003002400 MOV.B   #0x3, &0x24
+     59            TI_CC_SW_PxIFG &= ~(TI_CC_SW1+TI_CC_SW2);//Clr flags
+   \   00009C   F2F0FC002300 AND.B   #0xfc, &0x23
+     60            TI_CC_SW_PxIE = TI_CC_SW1+TI_CC_SW2;//Activate enables
+   \   0000A2   F24003002500 MOV.B   #0x3, &0x25
+     61          
+     62            TI_CC_LED_PxOUT &= ~(TI_CC_LED1 + TI_CC_LED2); //Outputs
+   \   0000A8   F2F0FC002900 AND.B   #0xfc, &0x29
+     63            TI_CC_LED_PxDIR = TI_CC_LED1 + TI_CC_LED2; //Outputs
+   \   0000AE   F24003002A00 MOV.B   #0x3, &0x2a
+     64          
+     65            TI_CC_GDO0_PxIES |= TI_CC_GDO0_PIN;       // Int on falling edge (end of pkt)
+   \   0000B4   F2D080002C00 BIS.B   #0x80, &0x2c
+     66            TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // Clear flag
+   \   0000BA   F2C080002B00 BIC.B   #0x80, &0x2b
+     67            TI_CC_GDO0_PxIE |= TI_CC_GDO0_PIN;        // Enable int on end of packet
+   \   0000C0   F2D080002D00 BIS.B   #0x80, &0x2d
+     68          
+     69            TI_CC_SPIStrobe(TI_CCxxx0_SRX);           // Initialize CCxxxx in RX mode.
+   \   0000C6   7C403400     MOV.B   #0x34, R12
+   \   0000CA   B012....     CALL    #TI_CC_SPIStrobe
+     70                                                      // When a pkt is received, it will
+     71                                                      // signal on GDO0 and wake CPU
+     72            __bis_SR_register(LPM3_bits + GIE);       // Enter LPM3, enable interrupts
+   \   0000CE   32D0D800     BIS.W   #0xd8, SR
+     73          }
+   \   0000D2   3B41         POP.W   R11
+   \   0000D4   3A41         POP.W   R10
+   \   0000D6   3041         RET
+   \   0000D8                REQUIRE _A_P5SEL
+   \   0000D8                REQUIRE _A_P5DIR
+   \   0000D8                REQUIRE _A_P5IN
+   \   0000D8                REQUIRE _A_P1IES
+   \   0000D8                REQUIRE _A_P1IFG
+   \   0000D8                REQUIRE _A_P1IE
+   \   0000D8                REQUIRE _A_P2OUT
+   \   0000D8                REQUIRE _A_P2DIR
+   \   0000D8                REQUIRE _A_P2IES
+   \   0000D8                REQUIRE _A_P2IFG
+   \   0000D8                REQUIRE _A_P2IE
+     74          
+     75          
+     76          // The ISR assumes the interrupt came from a press of one of the four buttons
+     77          // and therefore does not check the other four inputs.
+     78          #pragma vector=PORT1_VECTOR
+
+   \                                 In  segment CODE, align 2
+     79          __interrupt void port1_ISR (void)
+   \                     port1_ISR:
+     80          {
+   \   000000   0D12         PUSH.W  R13
+   \   000002   0C12         PUSH.W  R12
+   \   000004   0F12         PUSH.W  R15
+   \   000006   0E12         PUSH.W  R14
+   \   000008   2183         SUB.W   #0x2, SP
+     81            if(P1IFG & (TI_CC_SW1 + TI_CC_SW2))
+   \   00000A   F2B003002300 BIT.B   #0x3, &0x23
+   \   000010   1124         JEQ     ??port1_ISR_0
+     82            {
+     83              // Build packet
+     84              txBuffer[0] = 2;                           // Packet length
+   \   000012   E243....     MOV.B   #0x2, &txBuffer
+     85              txBuffer[1] = 0x01;                        // Packet address
+   \   000016   D243....     MOV.B   #0x1, &txBuffer + 1
+     86              txBuffer[2] = (~TI_CC_SW_PxIN) & 0x0F;     // Load four switch inputs
+   \   00001A   7E400F00     MOV.B   #0xf, R14
+   \   00001E   5EC22000     BIC.B   &0x20, R14
+   \   000022   C24E....     MOV.B   R14, &txBuffer + 2
+     87          
+     88              RFSendPacket(txBuffer, 3);                 // Send value over RF
+   \   000026   7D400300     MOV.B   #0x3, R13
+   \   00002A   3C40....     MOV.W   #txBuffer, R12
+   \   00002E   B012....     CALL    #RFSendPacket
+   \   000032   0F3C         JMP     ??port1_ISR_1
+     89            }
+     90            else if(P1IFG & TI_CC_GDO0_PIN)
+   \                     ??port1_ISR_0:
+   \   000034   C2932300     CMP.B   #0x0, &0x23
+   \   000038   0C34         JGE     ??port1_ISR_1
+     91            {
+     92              char len=2;                               // Len of pkt to be RXed (only addr
+   \   00003A   E1430000     MOV.B   #0x2, 0(SP)
+     93                                                      // plus data; size byte not incl b/c
+     94                                                      // stripped away within RX function)
+     95              if (RFReceivePacket(rxBuffer,&len))       // Fetch packet from CCxxxx
+   \   00003E   0D41         MOV.W   SP, R13
+   \   000040   3C40....     MOV.W   #rxBuffer, R12
+   \   000044   B012....     CALL    #RFReceivePacket
+   \   000048   4C93         CMP.B   #0x0, R12
+   \   00004A   0324         JEQ     ??port1_ISR_1
+     96                TI_CC_LED_PxOUT ^= rxBuffer[1];         // Toggle LEDs according to pkt data
+   \   00004C   D2E2....2900 XOR.B   &rxBuffer + 1, &0x29
+     97            }
+     98          //  P1IFG &= ~(TI_CC_SW1+TI_CC_SW2+TI_CC_SW3+TI_CC_SW4);//Clr flag that caused int
+     99          
+    100            TI_CC_SW_PxIFG &= ~(TI_CC_SW1+TI_CC_SW2); // Clr flag that caused int
+   \                     ??port1_ISR_1:
+   \   000052   F2F0FC002300 AND.B   #0xfc, &0x23
+    101            TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // After pkt TX, this flag is set.
+   \   000058   F2C080002B00 BIC.B   #0x80, &0x2b
+    102          }                                           // Clear it.
+   \   00005E   2153         ADD.W   #0x2, SP
+   \   000060   3E41         POP.W   R14
+   \   000062   3F41         POP.W   R15
+   \   000064   3C41         POP.W   R12
+   \   000066   3D41         POP.W   R13
+   \   000068   0013         RETI
+   \   00006A                REQUIRE _A_P1IFG
+   \   00006A                REQUIRE _A_P1IN
+   \   00006A                REQUIRE _A_P2OUT
+   \   00006A                REQUIRE _A_P2IFG
+    103          
+    104          
+    105          // The ISR assumes the int came from the pin attached to GDO0 and therefore
+    106          // does not check the other seven inputs.  Interprets this as a signal from
+    107          // CCxxxx indicating packet received.
+    108          #pragma vector=PORT2_VECTOR
+
+   \                                 In  segment CODE, align 2
+    109          __interrupt void port2_ISR (void)
+   \                     port2_ISR:
+    110          {
+   \   000000   0D12         PUSH.W  R13
+   \   000002   0C12         PUSH.W  R12
+   \   000004   0F12         PUSH.W  R15
+   \   000006   0E12         PUSH.W  R14
+   \   000008   2183         SUB.W   #0x2, SP
+    111            char len=2;                               // Len of pkt to be RXed (only addr
+   \   00000A   E1430000     MOV.B   #0x2, 0(SP)
+    112                                                      // plus data; size byte not incl b/c
+    113                                                      // stripped away within RX function)
+    114            if (RFReceivePacket(rxBuffer,&len))       // Fetch packet from CCxxxx
+   \   00000E   0D41         MOV.W   SP, R13
+   \   000010   3C40....     MOV.W   #rxBuffer, R12
+   \   000014   B012....     CALL    #RFReceivePacket
+   \   000018   4C93         CMP.B   #0x0, R12
+   \   00001A   0324         JEQ     ??port2_ISR_0
+    115              TI_CC_LED_PxOUT ^= rxBuffer[1];         // Toggle LEDs according to pkt data
+   \   00001C   D2E2....2900 XOR.B   &rxBuffer + 1, &0x29
+    116          
+    117            TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;                 // Clear flag
+   \                     ??port2_ISR_0:
+   \   000022   F2C080002B00 BIC.B   #0x80, &0x2b
+    118          }
+   \   000028   2153         ADD.W   #0x2, SP
+   \   00002A   3E41         POP.W   R14
+   \   00002C   3F41         POP.W   R15
+   \   00002E   3C41         POP.W   R12
+   \   000030   3D41         POP.W   R13
+   \   000032   0013         RETI
+   \   000034                REQUIRE _A_P2OUT
+   \   000034                REQUIRE _A_P2IFG
+
+   \                                 In  segment INTVEC, offset 0x2, root
+   \                     `??port2_ISR::??INTVEC 2`:
+   \   000002   ....         DC16    port2_ISR
+
+   \                                 In  segment INTVEC, offset 0x8, root
+   \                     `??port1_ISR::??INTVEC 8`:
+   \   000008   ....         DC16    port1_ISR
+    119          
+    120          
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      6   main
+        6   -> TI_CC_PowerupResetCCxxxx
+        6   -> TI_CC_SPISetup
+        6   -> TI_CC_SPIStrobe
+        6   -> delay_ms
+        6   -> hal_clk_init
+        6   -> hal_spi_init
+        6   -> hal_timer_init
+        6   -> ps2_init
+        6   -> ps2_transfer
+        6   -> writeRFSettings_315
+        6   -> writeRFSettings_433
+        6   -> writeRFSettings_868
+        6   -> writeRFSettings_915
+     14   port1_ISR
+       14   -> RFReceivePacket
+       14   -> RFSendPacket
+     14   port2_ISR
+       14   -> RFReceivePacket
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       1  _A_P1IE
+       1  _A_P1IES
+       1  _A_P1IFG
+       1  _A_P1IN
+       1  _A_P2DIR
+       1  _A_P2IE
+       1  _A_P2IES
+       1  _A_P2IFG
+       1  _A_P2OUT
+       1  _A_P5DIR
+       1  _A_P5IN
+       1  _A_P5SEL
+       2  i
+     216  main
+     106  port1_ISR
+       2  port1_ISR::??INTVEC 8
+      52  port2_ISR
+       2  port2_ISR::??INTVEC 2
+       4  rxBuffer
+       4  txBuffer
+
+ 
+ 374 bytes in segment CODE
+  12 bytes in segment DATA16_AN
+  10 bytes in segment DATA16_Z
+   4 bytes in segment INTVEC
+ 
+ 374 bytes of CODE  memory
+   0 bytes of CONST memory (+  4 bytes shared)
+  10 bytes of DATA  memory (+ 12 bytes shared)
+
+Errors: none
+Warnings: 1

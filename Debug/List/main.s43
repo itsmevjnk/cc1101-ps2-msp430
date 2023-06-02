@@ -1,0 +1,591 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAR C/C++ Compiler V6.40.1.950/W32 for MSP430          10/Sep/2022  21:37:38
+// Copyright 1996-2015 IAR Systems AB.
+// Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+//
+//    __rt_version  =  3
+//    __double_size =  32
+//    __reg_r4      =  free
+//    __reg_r5      =  free
+//    __pic         =  no
+//    __core        =  430
+//    Source file   =  Y:\Dev\cc1101-ps2\main.c
+//    Command line  =  
+//        Y:\Dev\cc1101-ps2\main.c -D HAL_HW_F149 -lC
+//        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+//        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+//        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+//        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+//        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+//        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+//        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+//        __data16=DATA16 --segment __data20=DATA20
+//    List file     =  Y:\Dev\cc1101-ps2\Debug\List\main.s43
+//
+///////////////////////////////////////////////////////////////////////////////
+
+        NAME main
+
+        RTMODEL "__SystemLibrary", "DLib"
+        RTMODEL "__core", "430"
+        RTMODEL "__double_size", "32"
+        RTMODEL "__pic", "no"
+        RTMODEL "__reg_r4", "free"
+        RTMODEL "__reg_r5", "free"
+        RTMODEL "__rt_version", "3"
+
+        RSEG CSTACK:DATA:SORT:NOROOT(0)
+
+        EXTERN ?SwitchKey8
+        EXTERN ?cstart_init_zero
+        EXTERN ?longjmp_r4
+        EXTERN ?longjmp_r5
+        EXTERN ?setjmp_r4
+        EXTERN ?setjmp_r5
+
+        PUBWEAK `??port1_ISR::??INTVEC 8`
+        PUBWEAK `??port2_ISR::??INTVEC 2`
+        PUBWEAK ?setjmp_save_r4
+        PUBWEAK ?setjmp_save_r5
+        PUBWEAK _A_P1IE
+        PUBWEAK _A_P1IES
+        PUBWEAK _A_P1IFG
+        PUBWEAK _A_P1IN
+        PUBWEAK _A_P2DIR
+        PUBWEAK _A_P2IE
+        PUBWEAK _A_P2IES
+        PUBWEAK _A_P2IFG
+        PUBWEAK _A_P2OUT
+        PUBWEAK _A_P5DIR
+        PUBWEAK _A_P5IN
+        PUBWEAK _A_P5SEL
+        PUBLIC i
+        PUBLIC main
+        PUBLIC port1_ISR
+        PUBLIC port2_ISR
+        PUBLIC rxBuffer
+        PUBLIC txBuffer
+        
+          CFI Names cfiNames0
+          CFI StackFrame CFA SP DATA
+          CFI Resource PC:16, SP:16, SR:16, R4:16, R5:16, R6:16, R7:16, R8:16
+          CFI Resource R9:16, R10:16, R11:16, R12:16, R13:16, R14:16, R15:16
+          CFI EndNames cfiNames0
+        
+          CFI Common cfiCommon0 Using cfiNames0
+          CFI CodeAlign 2
+          CFI DataAlign 2
+          CFI ReturnAddress PC CODE
+          CFI CFA SP+2
+          CFI PC Frame(CFA, -2)
+          CFI SR Undefined
+          CFI R4 SameValue
+          CFI R5 SameValue
+          CFI R6 SameValue
+          CFI R7 SameValue
+          CFI R8 SameValue
+          CFI R9 SameValue
+          CFI R10 SameValue
+          CFI R11 SameValue
+          CFI R12 Undefined
+          CFI R13 Undefined
+          CFI R14 Undefined
+          CFI R15 Undefined
+          CFI EndCommon cfiCommon0
+        
+        
+          CFI Common cfiCommon1 Using cfiNames0
+          CFI CodeAlign 2
+          CFI DataAlign 2
+          CFI ReturnAddress PC CODE
+          CFI CFA SP+4
+          CFI PC Frame(CFA, -2)
+          CFI SR Frame(CFA, -4)
+          CFI R4 SameValue
+          CFI R5 SameValue
+          CFI R6 SameValue
+          CFI R7 SameValue
+          CFI R8 SameValue
+          CFI R9 SameValue
+          CFI R10 SameValue
+          CFI R11 SameValue
+          CFI R12 SameValue
+          CFI R13 SameValue
+          CFI R14 SameValue
+          CFI R15 SameValue
+          CFI EndCommon cfiCommon1
+        
+port1_ISR           SYMBOL "port1_ISR"
+`??port1_ISR::??INTVEC 8` SYMBOL "??INTVEC 8", port1_ISR
+port2_ISR           SYMBOL "port2_ISR"
+`??port2_ISR::??INTVEC 2` SYMBOL "??INTVEC 2", port2_ISR
+
+        EXTERN hal_clk_init
+        EXTERN hal_timer_init
+        EXTERN hal_spi_init
+        EXTERN ps2_init
+        EXTERN ps2_transfer
+        EXTERN delay_ms
+        EXTERN TI_CC_SPISetup
+        EXTERN TI_CC_PowerupResetCCxxxx
+        EXTERN writeRFSettings_315
+        EXTERN writeRFSettings_433
+        EXTERN writeRFSettings_868
+        EXTERN writeRFSettings_915
+        EXTERN TI_CC_SPIStrobe
+        EXTERN RFSendPacket
+        EXTERN RFReceivePacket
+
+// Y:\Dev\cc1101-ps2\main.c
+//    1 #include "main.h"
+
+        ASEGN DATA16_AN:DATA:NOROOT,020H
+// union <unnamed> volatile _A_P1IN
+_A_P1IN:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,023H
+// union <unnamed> volatile _A_P1IFG
+_A_P1IFG:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,024H
+// union <unnamed> volatile _A_P1IES
+_A_P1IES:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,025H
+// union <unnamed> volatile _A_P1IE
+_A_P1IE:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,029H
+// union <unnamed> volatile _A_P2OUT
+_A_P2OUT:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,02aH
+// union <unnamed> volatile _A_P2DIR
+_A_P2DIR:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,02bH
+// union <unnamed> volatile _A_P2IFG
+_A_P2IFG:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,02cH
+// union <unnamed> volatile _A_P2IES
+_A_P2IES:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,02dH
+// union <unnamed> volatile _A_P2IE
+_A_P2IE:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,030H
+// union <unnamed> volatile _A_P5IN
+_A_P5IN:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,032H
+// union <unnamed> volatile _A_P5DIR
+_A_P5DIR:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,033H
+// union <unnamed> volatile _A_P5SEL
+_A_P5SEL:
+        DS8 1
+//    2 
+//    3 extern char paTable[];
+//    4 extern char paTableLen;
+//    5 
+
+        RSEG DATA16_Z:DATA:SORT:NOROOT(0)
+        REQUIRE ?cstart_init_zero
+//    6 char txBuffer[4];
+txBuffer:
+        DS8 4
+
+        RSEG DATA16_Z:DATA:SORT:NOROOT(0)
+        REQUIRE ?cstart_init_zero
+//    7 char rxBuffer[4];
+rxBuffer:
+        DS8 4
+
+        RSEG DATA16_Z:DATA:SORT:NOROOT(1)
+        REQUIRE ?cstart_init_zero
+//    8 unsigned int i;
+i:
+        DS8 2
+//    9 
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//   10 void main (void)
+main:
+          CFI Block cfiBlock0 Using cfiCommon0
+          CFI Function main
+//   11 {
+        PUSH.W  R10
+          CFI R10 Frame(CFA, -4)
+          CFI CFA SP+4
+        PUSH.W  R11
+          CFI R11 Frame(CFA, -6)
+          CFI CFA SP+6
+//   12   hal_clk_init();  
+          CFI FunCall hal_clk_init
+        CALL    #hal_clk_init
+//   13   hal_timer_init();
+          CFI FunCall hal_timer_init
+        CALL    #hal_timer_init
+//   14   hal_spi_init();
+          CFI FunCall hal_spi_init
+        CALL    #hal_spi_init
+//   15   
+//   16   ps2_init();
+          CFI FunCall ps2_init
+        CALL    #ps2_init
+//   17   ps2_transfer(0x42); // test command to read PS2 gamepad
+        MOV.B   #0x42, R12
+          CFI FunCall ps2_transfer
+        CALL    #ps2_transfer
+//   18   
+//   19   P5SEL &= ~(BIT0+BIT1+BIT2+BIT3+BIT4+BIT5+BIT6+BIT7); //Set P5.0 to P5.7 as GPIO, functionally equiv to P5SEL = 0
+        MOV.B   &0x33, R10
+        MOV.B   #0x0, &0x33
+//   20   P5DIR &= ~(BIT0+BIT1+BIT2+BIT3+BIT4+BIT5+BIT6+BIT7); //Set P5.0 to P5.7 as input, functionally equiv to P5DIR = 0
+        MOV.B   &0x32, R11
+        MOV.B   #0x0, &0x32
+//   21   
+//   22 
+//   23   // 5ms delay to compensate for time to startup between MSP430 and CC1100/2500
+//   24   delay_ms(5);
+        MOV.W   #0x5, R12
+          CFI FunCall delay_ms
+        CALL    #delay_ms
+//   25   //__delay_cycles(5000);
+//   26   TI_CC_SPISetup();                         // Initialize SPI port
+          CFI FunCall TI_CC_SPISetup
+        CALL    #TI_CC_SPISetup
+//   27 
+//   28   TI_CC_PowerupResetCCxxxx();               // Reset CCxxxx
+          CFI FunCall TI_CC_PowerupResetCCxxxx
+        CALL    #TI_CC_PowerupResetCCxxxx
+//   29   
+//   30   
+//   31   //writeRFSettings(0);                        // Write RF settings to config reg, use channel 0
+//   32 
+//   33 //******************************************************************************
+//   34 // Freq and channel select. Bit 0 and 1 of 8bit dip switch selects freq, bit 2
+//   35 // to 7 selects channel
+//   36 //******************************************************************************
+//   37   
+//   38 switch (P5IN&3)
+        MOV.B   &0x30, R14
+        MOV.B   R14, R14
+        AND.W   #0x3, R14
+        SUB.B   #0x0, R14
+        JEQ     ??main_0
+        SUB.B   #0x1, R14
+        JEQ     ??main_1
+        SUB.B   #0x1, R14
+        JEQ     ??main_2
+        SUB.B   #0x1, R14
+        JEQ     ??main_3
+        JMP     ??main_4
+//   39 {
+//   40 	case 0:
+//   41 		writeRFSettings_315(P5IN >>2);
+??main_0:
+        MOV.B   &0x30, R12
+        CLRC
+        RRC.B   R12
+        RRA.B   R12
+          CFI FunCall writeRFSettings_315
+        CALL    #writeRFSettings_315
+//   42 		break;
+        JMP     ??main_4
+//   43 	case 1:
+//   44 		writeRFSettings_433(P5IN >>2);
+??main_1:
+        MOV.B   &0x30, R12
+        CLRC
+        RRC.B   R12
+        RRA.B   R12
+          CFI FunCall writeRFSettings_433
+        CALL    #writeRFSettings_433
+//   45 		break;
+        JMP     ??main_4
+//   46 	case 2:
+//   47 		writeRFSettings_868(P5IN >>2);
+??main_2:
+        MOV.B   &0x30, R12
+        CLRC
+        RRC.B   R12
+        RRA.B   R12
+          CFI FunCall writeRFSettings_868
+        CALL    #writeRFSettings_868
+//   48 		break;
+        JMP     ??main_4
+//   49 	case 3:
+//   50 		writeRFSettings_915(P5IN >>2);
+??main_3:
+        MOV.B   &0x30, R12
+        CLRC
+        RRC.B   R12
+        RRA.B   R12
+          CFI FunCall writeRFSettings_915
+        CALL    #writeRFSettings_915
+//   51 		break;
+//   52 }
+//   53 
+//   54   
+//   55   
+//   56   //TI_CC_SPIWriteBurstReg(TI_CCxxx0_PATABLE, paTable, paTableLen);//Write PATABLE
+//   57 
+//   58   TI_CC_SW_PxIES = TI_CC_SW1+TI_CC_SW2;//Int on falling edge
+??main_4:
+        MOV.B   #0x3, &0x24
+//   59   TI_CC_SW_PxIFG &= ~(TI_CC_SW1+TI_CC_SW2);//Clr flags
+        AND.B   #0xfc, &0x23
+//   60   TI_CC_SW_PxIE = TI_CC_SW1+TI_CC_SW2;//Activate enables
+        MOV.B   #0x3, &0x25
+//   61 
+//   62   TI_CC_LED_PxOUT &= ~(TI_CC_LED1 + TI_CC_LED2); //Outputs
+        AND.B   #0xfc, &0x29
+//   63   TI_CC_LED_PxDIR = TI_CC_LED1 + TI_CC_LED2; //Outputs
+        MOV.B   #0x3, &0x2a
+//   64 
+//   65   TI_CC_GDO0_PxIES |= TI_CC_GDO0_PIN;       // Int on falling edge (end of pkt)
+        BIS.B   #0x80, &0x2c
+//   66   TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // Clear flag
+        BIC.B   #0x80, &0x2b
+//   67   TI_CC_GDO0_PxIE |= TI_CC_GDO0_PIN;        // Enable int on end of packet
+        BIS.B   #0x80, &0x2d
+//   68 
+//   69   TI_CC_SPIStrobe(TI_CCxxx0_SRX);           // Initialize CCxxxx in RX mode.
+        MOV.B   #0x34, R12
+          CFI FunCall TI_CC_SPIStrobe
+        CALL    #TI_CC_SPIStrobe
+//   70                                             // When a pkt is received, it will
+//   71                                             // signal on GDO0 and wake CPU
+//   72   __bis_SR_register(LPM3_bits + GIE);       // Enter LPM3, enable interrupts
+        BIS.W   #0xd8, SR
+//   73 }
+        POP.W   R11
+          CFI R11 SameValue
+          CFI CFA SP+4
+        POP.W   R10
+          CFI R10 SameValue
+          CFI CFA SP+2
+        RET
+          CFI EndBlock cfiBlock0
+        REQUIRE _A_P5SEL
+        REQUIRE _A_P5DIR
+        REQUIRE _A_P5IN
+        REQUIRE _A_P1IES
+        REQUIRE _A_P1IFG
+        REQUIRE _A_P1IE
+        REQUIRE _A_P2OUT
+        REQUIRE _A_P2DIR
+        REQUIRE _A_P2IES
+        REQUIRE _A_P2IFG
+        REQUIRE _A_P2IE
+//   74 
+//   75 
+//   76 // The ISR assumes the interrupt came from a press of one of the four buttons
+//   77 // and therefore does not check the other four inputs.
+//   78 #pragma vector=PORT1_VECTOR
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+        CALL_GRAPH_ROOT port1_ISR, "interrupt"
+//   79 __interrupt void port1_ISR (void)
+port1_ISR:
+          CFI Block cfiBlock1 Using cfiCommon1
+          CFI Function port1_ISR
+//   80 {
+        PUSH.W  R13
+          CFI R13 Frame(CFA, -6)
+          CFI CFA SP+6
+        PUSH.W  R12
+          CFI R12 Frame(CFA, -8)
+          CFI CFA SP+8
+        PUSH.W  R15
+          CFI R15 Frame(CFA, -10)
+          CFI CFA SP+10
+        PUSH.W  R14
+          CFI R14 Frame(CFA, -12)
+          CFI CFA SP+12
+        SUB.W   #0x2, SP
+          CFI CFA SP+14
+//   81   if(P1IFG & (TI_CC_SW1 + TI_CC_SW2))
+        BIT.B   #0x3, &0x23
+        JEQ     ??port1_ISR_0
+//   82   {
+//   83     // Build packet
+//   84     txBuffer[0] = 2;                           // Packet length
+        MOV.B   #0x2, &txBuffer
+//   85     txBuffer[1] = 0x01;                        // Packet address
+        MOV.B   #0x1, &txBuffer + 1
+//   86     txBuffer[2] = (~TI_CC_SW_PxIN) & 0x0F;     // Load four switch inputs
+        MOV.B   #0xf, R14
+        BIC.B   &0x20, R14
+        MOV.B   R14, &txBuffer + 2
+//   87 
+//   88     RFSendPacket(txBuffer, 3);                 // Send value over RF
+        MOV.B   #0x3, R13
+        MOV.W   #txBuffer, R12
+          CFI FunCall RFSendPacket
+        CALL    #RFSendPacket
+        JMP     ??port1_ISR_1
+//   89   }
+//   90   else if(P1IFG & TI_CC_GDO0_PIN)
+??port1_ISR_0:
+        CMP.B   #0x0, &0x23
+        JGE     ??port1_ISR_1
+//   91   {
+//   92     char len=2;                               // Len of pkt to be RXed (only addr
+        MOV.B   #0x2, 0(SP)
+//   93                                             // plus data; size byte not incl b/c
+//   94                                             // stripped away within RX function)
+//   95     if (RFReceivePacket(rxBuffer,&len))       // Fetch packet from CCxxxx
+        MOV.W   SP, R13
+        MOV.W   #rxBuffer, R12
+          CFI FunCall RFReceivePacket
+        CALL    #RFReceivePacket
+        CMP.B   #0x0, R12
+        JEQ     ??port1_ISR_1
+//   96       TI_CC_LED_PxOUT ^= rxBuffer[1];         // Toggle LEDs according to pkt data
+        XOR.B   &rxBuffer + 1, &0x29
+//   97   }
+//   98 //  P1IFG &= ~(TI_CC_SW1+TI_CC_SW2+TI_CC_SW3+TI_CC_SW4);//Clr flag that caused int
+//   99 
+//  100   TI_CC_SW_PxIFG &= ~(TI_CC_SW1+TI_CC_SW2); // Clr flag that caused int
+??port1_ISR_1:
+        AND.B   #0xfc, &0x23
+//  101   TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // After pkt TX, this flag is set.
+        BIC.B   #0x80, &0x2b
+//  102 }                                           // Clear it.
+        ADD.W   #0x2, SP
+          CFI CFA SP+12
+        POP.W   R14
+          CFI R14 SameValue
+          CFI CFA SP+10
+        POP.W   R15
+          CFI R15 SameValue
+          CFI CFA SP+8
+        POP.W   R12
+          CFI R12 SameValue
+          CFI CFA SP+6
+        POP.W   R13
+          CFI R13 SameValue
+          CFI CFA SP+4
+        RETI
+          CFI EndBlock cfiBlock1
+        REQUIRE _A_P1IFG
+        REQUIRE _A_P1IN
+        REQUIRE _A_P2OUT
+        REQUIRE _A_P2IFG
+//  103 
+//  104 
+//  105 // The ISR assumes the int came from the pin attached to GDO0 and therefore
+//  106 // does not check the other seven inputs.  Interprets this as a signal from
+//  107 // CCxxxx indicating packet received.
+//  108 #pragma vector=PORT2_VECTOR
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+        CALL_GRAPH_ROOT port2_ISR, "interrupt"
+//  109 __interrupt void port2_ISR (void)
+port2_ISR:
+          CFI Block cfiBlock2 Using cfiCommon1
+          CFI Function port2_ISR
+//  110 {
+        PUSH.W  R13
+          CFI R13 Frame(CFA, -6)
+          CFI CFA SP+6
+        PUSH.W  R12
+          CFI R12 Frame(CFA, -8)
+          CFI CFA SP+8
+        PUSH.W  R15
+          CFI R15 Frame(CFA, -10)
+          CFI CFA SP+10
+        PUSH.W  R14
+          CFI R14 Frame(CFA, -12)
+          CFI CFA SP+12
+        SUB.W   #0x2, SP
+          CFI CFA SP+14
+//  111   char len=2;                               // Len of pkt to be RXed (only addr
+        MOV.B   #0x2, 0(SP)
+//  112                                             // plus data; size byte not incl b/c
+//  113                                             // stripped away within RX function)
+//  114   if (RFReceivePacket(rxBuffer,&len))       // Fetch packet from CCxxxx
+        MOV.W   SP, R13
+        MOV.W   #rxBuffer, R12
+          CFI FunCall RFReceivePacket
+        CALL    #RFReceivePacket
+        CMP.B   #0x0, R12
+        JEQ     ??port2_ISR_0
+//  115     TI_CC_LED_PxOUT ^= rxBuffer[1];         // Toggle LEDs according to pkt data
+        XOR.B   &rxBuffer + 1, &0x29
+//  116 
+//  117   TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;                 // Clear flag
+??port2_ISR_0:
+        BIC.B   #0x80, &0x2b
+//  118 }
+        ADD.W   #0x2, SP
+          CFI CFA SP+12
+        POP.W   R14
+          CFI R14 SameValue
+          CFI CFA SP+10
+        POP.W   R15
+          CFI R15 SameValue
+          CFI CFA SP+8
+        POP.W   R12
+          CFI R12 SameValue
+          CFI CFA SP+6
+        POP.W   R13
+          CFI R13 SameValue
+          CFI CFA SP+4
+        RETI
+          CFI EndBlock cfiBlock2
+        REQUIRE _A_P2OUT
+        REQUIRE _A_P2IFG
+
+        COMMON INTVEC:CONST:ROOT(1)
+        ORG 2
+`??port2_ISR::??INTVEC 2`:
+        DC16    port2_ISR
+
+        COMMON INTVEC:CONST:ROOT(1)
+        ORG 8
+`??port1_ISR::??INTVEC 8`:
+        DC16    port1_ISR
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r4:
+        REQUIRE ?setjmp_r4
+        REQUIRE ?longjmp_r4
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r5:
+        REQUIRE ?setjmp_r5
+        REQUIRE ?longjmp_r5
+
+        END
+//  119 
+//  120 
+// 
+// 374 bytes in segment CODE
+//  12 bytes in segment DATA16_AN
+//  10 bytes in segment DATA16_Z
+//   4 bytes in segment INTVEC
+// 
+// 374 bytes of CODE  memory
+//   0 bytes of CONST memory (+  4 bytes shared)
+//  10 bytes of DATA  memory (+ 12 bytes shared)
+//
+//Errors: none
+//Warnings: 1

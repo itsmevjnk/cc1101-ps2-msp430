@@ -1,0 +1,209 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V6.40.1.950/W32 for MSP430           10/Sep/2022  21:37:39
+# Copyright 1996-2015 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+#
+#    __rt_version  =  3
+#    __double_size =  32
+#    __reg_r4      =  free
+#    __reg_r5      =  free
+#    __pic         =  no
+#    __core        =  430
+#    Source file   =  Y:\Dev\cc1101-ps2\lib\src\ps2.c
+#    Command line  =  
+#        Y:\Dev\cc1101-ps2\lib\src\ps2.c -D HAL_HW_F149 -lC
+#        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+#        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+#        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+#        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+#        __data16=DATA16 --segment __data20=DATA20
+#    List file     =  Y:\Dev\cc1101-ps2\Debug\List\ps2.lst
+#    Object file   =  Y:\Dev\cc1101-ps2\Debug\Obj\ps2.r43
+#
+###############################################################################
+
+Y:\Dev\cc1101-ps2\lib\src\ps2.c
+      1          #include "ps2.h"
+      2          #include "hal_gpio.h"
+
+   \                                 In  segment DATA16_AN, at 0x1d
+   \   union <unnamed> volatile _A_P4OUT
+   \                     _A_P4OUT:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x1e
+   \   union <unnamed> volatile _A_P4DIR
+   \                     _A_P4DIR:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x1f
+   \   union <unnamed> volatile _A_P4SEL
+   \                     _A_P4SEL:
+   \   000000                DS8 1
+      3          #include "hal_spi.h"
+      4          #include "hal_timer.h"
+      5          #include "delay.h"
+      6          
+
+   \                                 In  segment DATA16_Z, align 1, align-sorted
+   \   000000                REQUIRE ?cstart_init_zero
+      7          static unsigned char ps2_last_read = 0; // timestamp of last time the controller was read
+   \                     ps2_last_read:
+   \   000000                DS8 1
+      8          
+      9          #define PS2_ATT_LOW                 {while(hal_timer_ticks - ps2_last_read < PS2_DELAY_PACKET); hal_gpio_out_low(PS2_PORT_ATT, PS2_PIN_ATT); delay_us(PS2_DELAY_BYTE);} // activate ATT pin
+     10          #define PS2_ATT_HIGH                {hal_gpio_out_high(PS2_PORT_ATT, PS2_PIN_ATT);} // deactivate ATT pin
+     11          
+
+   \                                 In  segment DATA16_Z, align 1, align-sorted
+   \   000000                REQUIRE ?cstart_init_zero
+     12          unsigned char ps2_buffer[32];
+   \                     ps2_buffer:
+   \   000000                DS8 32
+     13          
+
+   \                                 In  segment CODE, align 2
+     14          unsigned char ps2_transfer(unsigned char command) {
+   \                     ps2_transfer:
+   \   000000   0A12         PUSH.W  R10
+   \   000002   0B12         PUSH.W  R11
+   \   000004   4B4C         MOV.B   R12, R11
+     15            PS2_ATT_LOW;
+                   ^
+Warning[Pe1665]: concatenation with ";" in macro "hal_gpio_out_low_prep" does
+          not create a valid token
+   \                     ??ps2_transfer_0:
+   \   000006   1C42....     MOV.W   &hal_timer_ticks, R12
+   \   00000A   1D42....     MOV.W   &hal_timer_ticks + 2, R13
+   \   00000E   5E42....     MOV.B   &ps2_last_read, R14
+   \   000012   4E4E         MOV.B   R14, R14
+   \   000014   0F43         MOV.W   #0x0, R15
+   \   000016   0C8E         SUB.W   R14, R12
+   \   000018   0D7F         SUBC.W  R15, R13
+   \   00001A   0D93         CMP.W   #0x0, R13
+   \   00001C   F42B         JNC     ??ps2_transfer_0
+   \   00001E   0320         JNE     ??ps2_transfer_4
+   \   000020   3C901000     CMP.W   #0x10, R12
+   \   000024   F02B         JNC     ??ps2_transfer_0
+   \                     ??ps2_transfer_4:
+   \   000026   D2C31D00     BIC.B   #0x1, &0x1d
+   \   00002A   3C400A00     MOV.W   #0xa, R12
+   \   00002E   B012....     CALL    #delay_us
+     16            
+     17            unsigned char ret = 0; // return value
+   \   000032   4A43         MOV.B   #0x0, R10
+     18            if(hal_spi_transfer(0x01) != 0xFF) goto finish; // first byte mismatch
+   \   000034   5C43         MOV.B   #0x1, R12
+   \   000036   B012....     CALL    #hal_spi_transfer
+   \   00003A   7C93         CMP.B   #0xff, R12
+   \   00003C   1E20         JNE     ??ps2_transfer_3
+     19            ret = hal_spi_transfer(command);
+   \   00003E   4C4B         MOV.B   R11, R12
+   \   000040   B012....     CALL    #hal_spi_transfer
+   \   000044   4A4C         MOV.B   R12, R10
+     20            if(hal_spi_transfer(0x00) != 0x5A) { ret = 0; goto finish; } // third byte mismatch
+   \   000046   4C43         MOV.B   #0x0, R12
+   \   000048   B012....     CALL    #hal_spi_transfer
+   \   00004C   7C905A00     CMP.B   #0x5a, R12
+   \   000050   0224         JEQ     ??ps2_transfer_5
+   \   000052   4A43         MOV.B   #0x0, R10
+   \   000054   123C         JMP     ??ps2_transfer_3
+     21            
+     22            for(unsigned char i = 0; i < (ps2_transfer_words(ret) << 1); i++) ps2_buffer[i] = hal_spi_transfer(ps2_buffer[i]); // this first reads ps2_buffer[i] to get the command byte, then saves the received data byte to ps2_buffer[i]
+   \                     ??ps2_transfer_5:
+   \   000056   4B43         MOV.B   #0x0, R11
+   \   000058   093C         JMP     ??ps2_transfer_6
+   \                     ??ps2_transfer_1:
+   \   00005A   4B4B         MOV.B   R11, R11
+   \   00005C   5C4B....     MOV.B   ps2_buffer(R11), R12
+   \   000060   B012....     CALL    #hal_spi_transfer
+   \   000064   4B4B         MOV.B   R11, R11
+   \   000066   CB4C....     MOV.B   R12, ps2_buffer(R11)
+   \   00006A   5B53         ADD.B   #0x1, R11
+   \                     ??ps2_transfer_6:
+   \   00006C   4B4B         MOV.B   R11, R11
+   \   00006E   4F4A         MOV.B   R10, R15
+   \   000070   3FF00F00     AND.W   #0xf, R15
+   \   000074   0F5F         RLA.W   R15
+   \   000076   0B9F         CMP.W   R15, R11
+   \   000078   F03B         JL      ??ps2_transfer_1
+     23            
+     24          finish:
+     25            PS2_ATT_HIGH;
+                   ^
+Warning[Pe1665]: concatenation with ";" in macro "hal_gpio_out_high_prep" does
+          not create a valid token
+   \                     ??ps2_transfer_3:
+   \   00007A   D2D31D00     BIS.B   #0x1, &0x1d
+     26            return ret;
+   \   00007E   4C4A         MOV.B   R10, R12
+   \   000080   3B41         POP.W   R11
+   \   000082   3A41         POP.W   R10
+   \   000084   3041         RET
+   \   000086                REQUIRE _A_P4OUT
+     27          }
+     28          
+
+   \                                 In  segment CODE, align 2
+     29          void ps2_init(void) {
+   \                     ps2_init:
+     30            /* configure the GPIO pin for ATT */
+     31            hal_gpio_func_io(PS2_PORT_ATT, PS2_PIN_ATT);
+                   ^
+Warning[Pe1665]: concatenation with ";" in macro "hal_gpio_func_io_prep" does
+          not create a valid token
+   \   000000   D2C31F00     BIC.B   #0x1, &0x1f
+     32            hal_gpio_dir_output(PS2_PORT_ATT, PS2_PIN_ATT);
+                   ^
+Warning[Pe1665]: concatenation with ";" in macro "hal_gpio_dir_output_prep"
+          does not create a valid token
+   \   000004   D2D31E00     BIS.B   #0x1, &0x1e
+     33            hal_gpio_out_high(PS2_PORT_ATT, PS2_PIN_ATT);
+                   ^
+Warning[Pe1665]: concatenation with ";" in macro "hal_gpio_out_high_prep" does
+          not create a valid token
+   \   000008   D2D31D00     BIS.B   #0x1, &0x1d
+     34            
+     35            
+     36          }
+   \   00000C   3041         RET
+   \   00000E                REQUIRE _A_P4SEL
+   \   00000E                REQUIRE _A_P4DIR
+   \   00000E                REQUIRE _A_P4OUT
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      2   ps2_init
+      6   ps2_transfer
+        6   -> delay_us
+        6   -> hal_spi_transfer
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       1  _A_P4DIR
+       1  _A_P4OUT
+       1  _A_P4SEL
+      32  ps2_buffer
+      14  ps2_init
+       1  ps2_last_read
+     134  ps2_transfer
+
+ 
+ 148 bytes in segment CODE
+   3 bytes in segment DATA16_AN
+  33 bytes in segment DATA16_Z
+ 
+ 148 bytes of CODE memory
+  33 bytes of DATA memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: 5

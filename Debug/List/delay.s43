@@ -1,0 +1,180 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAR C/C++ Compiler V6.40.1.950/W32 for MSP430          10/Sep/2022  21:37:37
+// Copyright 1996-2015 IAR Systems AB.
+// Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+//
+//    __rt_version  =  3
+//    __double_size =  32
+//    __reg_r4      =  free
+//    __reg_r5      =  free
+//    __pic         =  no
+//    __core        =  430
+//    Source file   =  Y:\Dev\cc1101-ps2\lib\src\delay.c
+//    Command line  =  
+//        Y:\Dev\cc1101-ps2\lib\src\delay.c -D HAL_HW_F149 -lC
+//        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+//        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+//        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+//        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+//        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+//        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+//        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+//        __data16=DATA16 --segment __data20=DATA20
+//    List file     =  Y:\Dev\cc1101-ps2\Debug\List\delay.s43
+//
+///////////////////////////////////////////////////////////////////////////////
+
+        NAME delay
+
+        RTMODEL "__SystemLibrary", "DLib"
+        RTMODEL "__core", "430"
+        RTMODEL "__double_size", "32"
+        RTMODEL "__pic", "no"
+        RTMODEL "__reg_r4", "free"
+        RTMODEL "__reg_r5", "free"
+        RTMODEL "__rt_version", "3"
+
+        RSEG CSTACK:DATA:SORT:NOROOT(0)
+
+        EXTERN ?longjmp_r4
+        EXTERN ?longjmp_r5
+        EXTERN ?setjmp_r4
+        EXTERN ?setjmp_r5
+
+        PUBWEAK ?setjmp_save_r4
+        PUBWEAK ?setjmp_save_r5
+        PUBWEAK TBCCR0
+        PUBWEAK _A_TBCTL
+        PUBLIC delay_ms
+        PUBLIC delay_us
+        
+          CFI Names cfiNames0
+          CFI StackFrame CFA SP DATA
+          CFI Resource PC:16, SP:16, SR:16, R4:16, R5:16, R6:16, R7:16, R8:16
+          CFI Resource R9:16, R10:16, R11:16, R12:16, R13:16, R14:16, R15:16
+          CFI EndNames cfiNames0
+        
+          CFI Common cfiCommon0 Using cfiNames0
+          CFI CodeAlign 2
+          CFI DataAlign 2
+          CFI ReturnAddress PC CODE
+          CFI CFA SP+2
+          CFI PC Frame(CFA, -2)
+          CFI SR Undefined
+          CFI R4 SameValue
+          CFI R5 SameValue
+          CFI R6 SameValue
+          CFI R7 SameValue
+          CFI R8 SameValue
+          CFI R9 SameValue
+          CFI R10 SameValue
+          CFI R11 SameValue
+          CFI R12 Undefined
+          CFI R13 Undefined
+          CFI R14 Undefined
+          CFI R15 Undefined
+          CFI EndCommon cfiCommon0
+        
+        EXTERN hal_timer_ticks
+
+// Y:\Dev\cc1101-ps2\lib\src\delay.c
+//    1 #include "delay.h"
+
+        ASEGN DATA16_AN:DATA:NOROOT,0180H
+// union <unnamed> volatile _A_TBCTL
+_A_TBCTL:
+        DS8 2
+
+        ASEGN DATA16_AN:DATA:NOROOT,0192H
+// unsigned short volatile TBCCR0
+TBCCR0:
+        DS8 2
+//    2 #include "hal_timer.h"
+//    3 #include "hal_hwdef.h"
+//    4 
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//    5 void delay_ms(unsigned int t) {
+delay_ms:
+          CFI Block cfiBlock0 Using cfiCommon0
+          CFI Function delay_ms
+          CFI NoCalls
+        PUSH.W  R10
+          CFI R10 Frame(CFA, -4)
+          CFI CFA SP+4
+        PUSH.W  R11
+          CFI R11 Frame(CFA, -6)
+          CFI CFA SP+6
+//    6   unsigned long t_start = hal_timer_ticks;
+        MOV.W   &hal_timer_ticks, R14
+        MOV.W   &hal_timer_ticks + 2, R15
+//    7   while(hal_timer_ticks - t_start < t);
+??delay_ms_0:
+        MOV.W   &hal_timer_ticks, R10
+        MOV.W   &hal_timer_ticks + 2, R11
+        SUB.W   R14, R10
+        SUBC.W  R15, R11
+        MOV.W   #0x0, R13
+        CMP.W   R13, R11
+        JNC     ??delay_ms_0
+        JNE     ??delay_ms_1
+        CMP.W   R12, R10
+        JNC     ??delay_ms_0
+//    8 }
+??delay_ms_1:
+        POP.W   R11
+          CFI R11 SameValue
+          CFI CFA SP+4
+        POP.W   R10
+          CFI R10 SameValue
+          CFI CFA SP+2
+        RET
+          CFI EndBlock cfiBlock0
+//    9 
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//   10 void delay_us(unsigned int t) {
+delay_us:
+          CFI Block cfiBlock1 Using cfiCommon0
+          CFI Function delay_us
+          CFI NoCalls
+//   11   HAL_TIMER_REG_TBxCCR0 = (HAL_CLK_SMCLK / 1000000) * t;
+        RLA.W   R12
+        RLA.W   R12
+        RLA.W   R12
+        MOV.W   R12, &0x192
+//   12   HAL_TIMER_REG_TBxCTL |= MC_0; // up mode
+        MOV.W   &0x180, &0x180
+//   13   while(!(HAL_TIMER_REG_TBxCTL & TBIFG)); // wait until TBR = TBCL0
+??delay_us_0:
+        BIT.W   #0x1, &0x180
+        JNC     ??delay_us_0
+//   14   HAL_TIMER_REG_TBxCTL |= TBCLR; // reset, disabling Timer_B
+        BIS.W   #0x4, &0x180
+//   15 }
+        RET
+          CFI EndBlock cfiBlock1
+        REQUIRE TBCCR0
+        REQUIRE _A_TBCTL
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r4:
+        REQUIRE ?setjmp_r4
+        REQUIRE ?longjmp_r4
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r5:
+        REQUIRE ?setjmp_r5
+        REQUIRE ?longjmp_r5
+
+        END
+// 
+// 70 bytes in segment CODE
+//  4 bytes in segment DATA16_AN
+// 
+// 70 bytes of CODE memory
+//  0 bytes of DATA memory (+ 4 bytes shared)
+//
+//Errors: none
+//Warnings: none

@@ -1,0 +1,364 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAR C/C++ Compiler V6.40.1.950/W32 for MSP430          10/Sep/2022  21:37:38
+// Copyright 1996-2015 IAR Systems AB.
+// Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+//
+//    __rt_version  =  3
+//    __double_size =  32
+//    __reg_r4      =  free
+//    __reg_r5      =  free
+//    __pic         =  no
+//    __core        =  430
+//    Source file   =  Y:\Dev\cc1101-ps2\hal\src\hal_spi.c
+//    Command line  =  
+//        Y:\Dev\cc1101-ps2\hal\src\hal_spi.c -D HAL_HW_F149 -lC
+//        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+//        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+//        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+//        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+//        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+//        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+//        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+//        __data16=DATA16 --segment __data20=DATA20
+//    List file     =  Y:\Dev\cc1101-ps2\Debug\List\hal_spi.s43
+//
+///////////////////////////////////////////////////////////////////////////////
+
+        NAME hal_spi
+
+        RTMODEL "__SystemLibrary", "DLib"
+        RTMODEL "__core", "430"
+        RTMODEL "__double_size", "32"
+        RTMODEL "__pic", "no"
+        RTMODEL "__reg_r4", "free"
+        RTMODEL "__reg_r5", "free"
+        RTMODEL "__rt_version", "3"
+
+        RSEG CSTACK:DATA:SORT:NOROOT(0)
+
+        EXTERN ?Epilogue4
+        EXTERN ?longjmp_r4
+        EXTERN ?longjmp_r5
+        EXTERN ?setjmp_r4
+        EXTERN ?setjmp_r5
+
+        PUBWEAK ?setjmp_save_r4
+        PUBWEAK ?setjmp_save_r5
+        PUBWEAK U1BR0
+        PUBWEAK U1BR1
+        PUBWEAK U1RXBUF
+        PUBWEAK U1TXBUF
+        PUBWEAK _A_IFG2
+        PUBWEAK _A_ME2
+        PUBWEAK _A_P5SEL
+        PUBWEAK _A_U1CTL
+        PUBWEAK _A_U1TCTL
+        PUBLIC hal_spi_init
+        PUBLIC hal_spi_transfer
+        
+          CFI Names cfiNames0
+          CFI StackFrame CFA SP DATA
+          CFI Resource PC:16, SP:16, SR:16, R4:16, R5:16, R6:16, R7:16, R8:16
+          CFI Resource R9:16, R10:16, R11:16, R12:16, R13:16, R14:16, R15:16
+          CFI EndNames cfiNames0
+        
+          CFI Common cfiCommon0 Using cfiNames0
+          CFI CodeAlign 2
+          CFI DataAlign 2
+          CFI ReturnAddress PC CODE
+          CFI CFA SP+2
+          CFI PC Frame(CFA, -2)
+          CFI SR Undefined
+          CFI R4 SameValue
+          CFI R5 SameValue
+          CFI R6 SameValue
+          CFI R7 SameValue
+          CFI R8 SameValue
+          CFI R9 SameValue
+          CFI R10 SameValue
+          CFI R11 SameValue
+          CFI R12 Undefined
+          CFI R13 Undefined
+          CFI R14 Undefined
+          CFI R15 Undefined
+          CFI EndCommon cfiCommon0
+        
+// Y:\Dev\cc1101-ps2\hal\src\hal_spi.c
+//    1 #include "hal_hwdef.h"
+
+        ASEGN DATA16_AN:DATA:NOROOT,03H
+// union <unnamed> volatile _A_IFG2
+_A_IFG2:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,05H
+// union <unnamed> volatile _A_ME2
+_A_ME2:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,033H
+// union <unnamed> volatile _A_P5SEL
+_A_P5SEL:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,078H
+// union <unnamed> volatile _A_U1CTL
+_A_U1CTL:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,079H
+// union <unnamed> volatile _A_U1TCTL
+_A_U1TCTL:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,07cH
+// unsigned char volatile U1BR0
+U1BR0:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,07dH
+// unsigned char volatile U1BR1
+U1BR1:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,07eH
+// unsigned char const volatile U1RXBUF
+U1RXBUF:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,07fH
+// unsigned char volatile U1TXBUF
+U1TXBUF:
+        DS8 1
+//    2 
+//    3 #include "hal_spi.h"
+//    4 #include "hal_gpio.h"
+//    5 
+//    6 /* low level functions */
+//    7 #if defined HAL_SPI_INTERFACE_USART0 || defined HAL_SPI_INTERFACE_USART1
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//    8 void hal_spi_init(void) {
+hal_spi_init:
+          CFI Block cfiBlock0 Using cfiCommon0
+          CFI Function hal_spi_init
+          CFI NoCalls
+//    9   HAL_SPI_REG_UxCTL = SWRST; // put USART peripheral in reset state
+        MOV.B   #0x1, &0x78
+//   10   
+//   11   /* general USART configuration */
+//   12   HAL_SPI_REG_UxCTL |= CHAR + SYNC + MM; // USART master, SPI mode, 8-bit data length
+        BIS.B   #0x16, &0x78
+//   13   HAL_SPI_REG_UxTCTL |= CKPH + CKPL + SSEL1 + SSEL0 + STC; // 3-pin SPI mode, using SMCLK as clock source, SPI mode 2
+        BIS.B   #0xf2, &0x79
+//   14   
+//   15   /* baud rate setting: UxBR = BRCLK / baud */
+//   16   HAL_SPI_REG_UxBR0 = (HAL_CLK_SMCLK / HAL_SPI_CLKSPEED) & 0xFF;
+        MOV.B   #0x20, &0x7c
+//   17   HAL_SPI_REG_UxBR1 = (HAL_CLK_SMCLK / HAL_SPI_CLKSPEED) >> 8;
+        MOV.B   #0x0, &0x7d
+//   18   
+//   19   HAL_SPI_REG_MEx |= HAL_SPI_BIT_USPIEx; // enable SPI peripheral
+        BIS.B   #0x10, &0x5
+//   20   
+//   21   /* set up pins */
+//   22   hal_gpio_func_peripheral(HAL_SPI_PORT_SIMO, HAL_SPI_PIN_SIMO);
+        BIS.B   #0x2, &0x33
+//   23   hal_gpio_func_peripheral(HAL_SPI_PORT_SOMI, HAL_SPI_PIN_SOMI);
+        BIS.B   #0x4, &0x33
+//   24   hal_gpio_func_peripheral(HAL_SPI_PORT_UCLK, HAL_SPI_PIN_UCLK);
+        BIS.B   #0x8, &0x33
+//   25   
+//   26   HAL_SPI_REG_UxCTL &= ~SWRST; // disable reset state, essentially turning on the peripheral
+        BIC.B   #0x1, &0x78
+//   27 }
+        RET
+          CFI EndBlock cfiBlock0
+        REQUIRE _A_U1CTL
+        REQUIRE _A_U1TCTL
+        REQUIRE U1BR0
+        REQUIRE U1BR1
+        REQUIRE _A_ME2
+        REQUIRE _A_P5SEL
+//   28 
+//   29 /* "building blocks" for interface functions */
+//   30 #define HAL_SPI_WAIT_RXBUF              {while(!(HAL_SPI_REG_IFGx & HAL_SPI_BIT_URXIFGx));} // wait until there is a byte to receive
+//   31 #define HAL_SPI_WAIT_TXBUF              {while(!(HAL_SPI_REG_IFGx & HAL_SPI_BIT_UTXIFGx));} // wait until the transmit buffer is ready to receive bytes
+//   32 #define HAL_SPI_GET_RXBUF               HAL_SPI_REG_UxRXBUF // get a byte from receive buffer
+//   33 #define HAL_SPI_SET_TXBUF(x)            {HAL_SPI_REG_UxTXBUF = (x);} // send a byte to transmit buffer and stage for transmission
+//   34 
+//   35 #else
+//   36 #error "No SPI interface defined"
+//   37 #endif
+//   38 
+//   39 /* high level interface functions */
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//   40 unsigned char hal_spi_transfer(unsigned char txbyte) {
+hal_spi_transfer:
+          CFI Block cfiBlock1 Using cfiCommon0
+          CFI Function hal_spi_transfer
+        PUSH.W  R10
+          CFI R10 Frame(CFA, -4)
+          CFI CFA SP+4
+        PUSH.W  R11
+          CFI R11 Frame(CFA, -6)
+          CFI CFA SP+6
+        PUSH.W  R8
+          CFI R8 Frame(CFA, -8)
+          CFI CFA SP+8
+        PUSH.W  R9
+          CFI R9 Frame(CFA, -10)
+          CFI CFA SP+10
+//   41   HAL_SPI_WAIT_TXBUF;
+??hal_spi_transfer_0:
+        BIT.B   #0x20, &0x3
+        JNC     ??hal_spi_transfer_0
+//   42   HAL_SPI_SET_TXBUF(((txbyte & 1) << 7) | ((txbyte & 2) << 5) | ((txbyte & 4) << 3) | ((txbyte & 8) << 1) | ((txbyte & 16) >> 1) | ((txbyte & 32) >> 3) | ((txbyte & 64) >> 5) | ((txbyte & 128) >> 7)); // bit order swapping
+        BIT.B   #0x80, R12
+        SUBC.B  R14, R14
+        ADD.B   #0x1, R14
+        MOV.B   R12, R15
+        CLRC
+        RRC.B   R15
+        RRA.B   R15
+        RRA.B   R15
+        RRA.B   R15
+        RRA.B   R15
+        AND.B   #0x2, R15
+        MOV.B   R12, R13
+        CLRC
+        RRC.B   R13
+        RRA.B   R13
+        RRA.B   R13
+        AND.B   #0x4, R13
+        MOV.B   R12, R10
+        CLRC
+        RRC.B   R10
+        AND.B   #0x8, R10
+        BIT.B   #0x8, R12
+        SUBC.B  R11, R11
+        ADD.B   #0x1, R11
+        RLA.B   R11
+        RLA.B   R11
+        RLA.B   R11
+        RLA.B   R11
+        BIT.B   #0x4, R12
+        SUBC.B  R8, R8
+        ADD.B   #0x1, R8
+        RLA.B   R8
+        RLA.B   R8
+        RLA.B   R8
+        RLA.B   R8
+        RLA.B   R8
+        BIT.B   #0x2, R12
+        SUBC.B  R9, R9
+        ADD.B   #0x1, R9
+        RLA.B   R9
+        RLA.B   R9
+        RLA.B   R9
+        RLA.B   R9
+        RLA.B   R9
+        RLA.B   R9
+        RRA.B   R12
+        MOV.B   #0x0, R12
+        RRC.B   R12
+        BIS.B   R9, R12
+        BIS.B   R8, R12
+        BIS.B   R11, R12
+        BIS.B   R10, R12
+        BIS.B   R13, R12
+        BIS.B   R15, R12
+        BIS.B   R14, R12
+        MOV.B   R12, &0x7f
+//   43   HAL_SPI_WAIT_RXBUF; // there's no need to wait for transmission to finish as SPI is a duplex protocol, as soon as transmission is finish reception will finish too
+??hal_spi_transfer_1:
+        BIT.B   #0x10, &0x3
+        JNC     ??hal_spi_transfer_1
+//   44   unsigned char rxbyte = HAL_SPI_GET_RXBUF;
+        MOV.B   &0x7e, R12
+//   45   return (((rxbyte & 1) << 7) | ((rxbyte & 2) << 5) | ((rxbyte & 4) << 3) | ((rxbyte & 8) << 1) | ((rxbyte & 16) >> 1) | ((rxbyte & 32) >> 3) | ((rxbyte & 64) >> 5) | ((rxbyte & 128) >> 7));
+        BIT.B   #0x80, R12
+        SUBC.B  R14, R14
+        ADD.B   #0x1, R14
+        MOV.B   R12, R15
+        CLRC
+        RRC.B   R15
+        RRA.B   R15
+        RRA.B   R15
+        RRA.B   R15
+        RRA.B   R15
+        AND.B   #0x2, R15
+        MOV.B   R12, R13
+        CLRC
+        RRC.B   R13
+        RRA.B   R13
+        RRA.B   R13
+        AND.B   #0x4, R13
+        MOV.B   R12, R10
+        CLRC
+        RRC.B   R10
+        AND.B   #0x8, R10
+        BIT.B   #0x8, R12
+        SUBC.B  R11, R11
+        ADD.B   #0x1, R11
+        RLA.B   R11
+        RLA.B   R11
+        RLA.B   R11
+        RLA.B   R11
+        BIT.B   #0x4, R12
+        SUBC.B  R8, R8
+        ADD.B   #0x1, R8
+        RLA.B   R8
+        RLA.B   R8
+        RLA.B   R8
+        RLA.B   R8
+        RLA.B   R8
+        BIT.B   #0x2, R12
+        SUBC.B  R9, R9
+        ADD.B   #0x1, R9
+        RLA.B   R9
+        RLA.B   R9
+        RLA.B   R9
+        RLA.B   R9
+        RLA.B   R9
+        RLA.B   R9
+        RRA.B   R12
+        MOV.B   #0x0, R12
+        RRC.B   R12
+        BIS.B   R9, R12
+        BIS.B   R8, R12
+        BIS.B   R11, R12
+        BIS.B   R10, R12
+        BIS.B   R13, R12
+        BIS.B   R15, R12
+        BIS.B   R14, R12
+          CFI FunCall ?Epilogue4
+        BR      #?Epilogue4
+          CFI EndBlock cfiBlock1
+        REQUIRE _A_IFG2
+        REQUIRE U1TXBUF
+        REQUIRE U1RXBUF
+//   46 }
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r4:
+        REQUIRE ?setjmp_r4
+        REQUIRE ?longjmp_r4
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r5:
+        REQUIRE ?setjmp_r5
+        REQUIRE ?longjmp_r5
+
+        END
+// 
+// 310 bytes in segment CODE
+//   9 bytes in segment DATA16_AN
+// 
+// 310 bytes of CODE memory
+//   0 bytes of DATA memory (+ 9 bytes shared)
+//
+//Errors: none
+//Warnings: 3

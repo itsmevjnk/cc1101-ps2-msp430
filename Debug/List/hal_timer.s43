@@ -1,0 +1,215 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAR C/C++ Compiler V6.40.1.950/W32 for MSP430          10/Sep/2022  21:37:38
+// Copyright 1996-2015 IAR Systems AB.
+// Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+//
+//    __rt_version  =  3
+//    __double_size =  32
+//    __reg_r4      =  free
+//    __reg_r5      =  free
+//    __pic         =  no
+//    __core        =  430
+//    Source file   =  Y:\Dev\cc1101-ps2\hal\src\hal_timer.c
+//    Command line  =  
+//        Y:\Dev\cc1101-ps2\hal\src\hal_timer.c -D HAL_HW_F149 -lC
+//        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+//        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+//        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+//        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+//        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+//        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+//        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+//        __data16=DATA16 --segment __data20=DATA20
+//    List file     =  Y:\Dev\cc1101-ps2\Debug\List\hal_timer.s43
+//
+///////////////////////////////////////////////////////////////////////////////
+
+        NAME hal_timer
+
+        RTMODEL "__SystemLibrary", "DLib"
+        RTMODEL "__core", "430"
+        RTMODEL "__double_size", "32"
+        RTMODEL "__pic", "no"
+        RTMODEL "__reg_r4", "free"
+        RTMODEL "__reg_r5", "free"
+        RTMODEL "__rt_version", "3"
+
+        RSEG CSTACK:DATA:SORT:NOROOT(0)
+
+        EXTERN ?cstart_init_zero
+        EXTERN ?longjmp_r4
+        EXTERN ?longjmp_r5
+        EXTERN ?setjmp_r4
+        EXTERN ?setjmp_r5
+
+        PUBWEAK `??hal_timer_ccr0_isr::??INTVEC 12`
+        PUBWEAK ?setjmp_save_r4
+        PUBWEAK ?setjmp_save_r5
+        PUBWEAK TACCR0
+        PUBWEAK _A_TACCTL0
+        PUBWEAK _A_TACTL
+        PUBWEAK _A_TBCTL
+        PUBLIC hal_timer_ccr0_isr
+        PUBLIC hal_timer_init
+        PUBLIC hal_timer_ticks
+        
+          CFI Names cfiNames0
+          CFI StackFrame CFA SP DATA
+          CFI Resource PC:16, SP:16, SR:16, R4:16, R5:16, R6:16, R7:16, R8:16
+          CFI Resource R9:16, R10:16, R11:16, R12:16, R13:16, R14:16, R15:16
+          CFI EndNames cfiNames0
+        
+          CFI Common cfiCommon0 Using cfiNames0
+          CFI CodeAlign 2
+          CFI DataAlign 2
+          CFI ReturnAddress PC CODE
+          CFI CFA SP+2
+          CFI PC Frame(CFA, -2)
+          CFI SR Undefined
+          CFI R4 SameValue
+          CFI R5 SameValue
+          CFI R6 SameValue
+          CFI R7 SameValue
+          CFI R8 SameValue
+          CFI R9 SameValue
+          CFI R10 SameValue
+          CFI R11 SameValue
+          CFI R12 Undefined
+          CFI R13 Undefined
+          CFI R14 Undefined
+          CFI R15 Undefined
+          CFI EndCommon cfiCommon0
+        
+        
+          CFI Common cfiCommon1 Using cfiNames0
+          CFI CodeAlign 2
+          CFI DataAlign 2
+          CFI ReturnAddress PC CODE
+          CFI CFA SP+4
+          CFI PC Frame(CFA, -2)
+          CFI SR Frame(CFA, -4)
+          CFI R4 SameValue
+          CFI R5 SameValue
+          CFI R6 SameValue
+          CFI R7 SameValue
+          CFI R8 SameValue
+          CFI R9 SameValue
+          CFI R10 SameValue
+          CFI R11 SameValue
+          CFI R12 SameValue
+          CFI R13 SameValue
+          CFI R14 SameValue
+          CFI R15 SameValue
+          CFI EndCommon cfiCommon1
+        
+hal_timer_ccr0_isr  SYMBOL "hal_timer_ccr0_isr"
+`??hal_timer_ccr0_isr::??INTVEC 12` SYMBOL "??INTVEC 12", hal_timer_ccr0_isr
+
+// Y:\Dev\cc1101-ps2\hal\src\hal_timer.c
+//    1 #include "hal_timer.h"
+//    2 #include "hal_hwdef.h"
+
+        ASEGN DATA16_AN:DATA:NOROOT,0160H
+// union <unnamed> volatile _A_TACTL
+_A_TACTL:
+        DS8 2
+
+        ASEGN DATA16_AN:DATA:NOROOT,0162H
+// union <unnamed> volatile _A_TACCTL0
+_A_TACCTL0:
+        DS8 2
+
+        ASEGN DATA16_AN:DATA:NOROOT,0172H
+// unsigned short volatile TACCR0
+TACCR0:
+        DS8 2
+
+        ASEGN DATA16_AN:DATA:NOROOT,0180H
+// union <unnamed> volatile _A_TBCTL
+_A_TBCTL:
+        DS8 2
+//    3 
+
+        RSEG DATA16_Z:DATA:SORT:NOROOT(1)
+        REQUIRE ?cstart_init_zero
+//    4 volatile unsigned long hal_timer_ticks = 0;
+hal_timer_ticks:
+        DS8 4
+//    5 
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//    6 void hal_timer_init(void) {
+hal_timer_init:
+          CFI Block cfiBlock0 Using cfiCommon0
+          CFI Function hal_timer_init
+          CFI NoCalls
+//    7   /* initialize tick timer */
+//    8   HAL_TIMER_REG_TAxCCR0 = 0; // stop the timer
+        MOV.W   #0x0, &0x172
+//    9   HAL_TIMER_REG_TAxCCTL0 |= CCIE; // enable compare/capture interrupt
+        BIS.W   #0x10, &0x162
+//   10   HAL_TIMER_REG_TAxCTL = TASSEL_2 + ID_0 + MC_1; // select SMCLK, prescaler = 1, up mode
+        MOV.W   #0x210, &0x160
+//   11   HAL_TIMER_REG_TAxCCR0 = (HAL_CLK_SMCLK / 1000) - 1; // set compare value so that the interrupt is triggered every 1ms
+        MOV.W   #0x1f3f, &0x172
+//   12   
+//   13   /* initialize microsecond delay timer */
+//   14   HAL_TIMER_REG_TBxCTL = TBSSEL_2 + TBCLR; // select SMCLK, prescaler = 1, clear TBR (mode will be set when we use it)
+        MOV.W   #0x204, &0x180
+//   15   
+//   16   __bis_SR_register(GIE); // enable interrupts
+        BIS.W   #0x8, SR
+//   17 }
+        RET
+          CFI EndBlock cfiBlock0
+        REQUIRE TACCR0
+        REQUIRE _A_TACCTL0
+        REQUIRE _A_TACTL
+        REQUIRE _A_TBCTL
+//   18 
+//   19 /* Timer_A capture/compare ISR */
+//   20 #pragma vector = TIMER0_A0_VECTOR
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+        CALL_GRAPH_ROOT hal_timer_ccr0_isr, "interrupt"
+//   21 __interrupt void hal_timer_ccr0_isr(void) {
+hal_timer_ccr0_isr:
+          CFI Block cfiBlock1 Using cfiCommon1
+          CFI Function hal_timer_ccr0_isr
+          CFI NoCalls
+//   22   hal_timer_ticks++;
+        ADD.W   #0x1, &hal_timer_ticks
+        ADDC.W  #0x0, &hal_timer_ticks + 2
+//   23 }
+        RETI
+          CFI EndBlock cfiBlock1
+
+        COMMON INTVEC:CONST:ROOT(1)
+        ORG 12
+`??hal_timer_ccr0_isr::??INTVEC 12`:
+        DC16    hal_timer_ccr0_isr
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r4:
+        REQUIRE ?setjmp_r4
+        REQUIRE ?longjmp_r4
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r5:
+        REQUIRE ?setjmp_r5
+        REQUIRE ?longjmp_r5
+
+        END
+// 
+// 42 bytes in segment CODE
+//  8 bytes in segment DATA16_AN
+//  4 bytes in segment DATA16_Z
+//  2 bytes in segment INTVEC
+// 
+// 42 bytes of CODE  memory
+//  0 bytes of CONST memory (+ 2 bytes shared)
+//  4 bytes of DATA  memory (+ 8 bytes shared)
+//
+//Errors: none
+//Warnings: none

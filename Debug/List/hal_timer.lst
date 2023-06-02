@@ -1,0 +1,135 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V6.40.1.950/W32 for MSP430           10/Sep/2022  21:37:38
+# Copyright 1996-2015 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+#
+#    __rt_version  =  3
+#    __double_size =  32
+#    __reg_r4      =  free
+#    __reg_r5      =  free
+#    __pic         =  no
+#    __core        =  430
+#    Source file   =  Y:\Dev\cc1101-ps2\hal\src\hal_timer.c
+#    Command line  =  
+#        Y:\Dev\cc1101-ps2\hal\src\hal_timer.c -D HAL_HW_F149 -lC
+#        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+#        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+#        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+#        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+#        __data16=DATA16 --segment __data20=DATA20
+#    List file     =  Y:\Dev\cc1101-ps2\Debug\List\hal_timer.lst
+#    Object file   =  Y:\Dev\cc1101-ps2\Debug\Obj\hal_timer.r43
+#
+###############################################################################
+
+Y:\Dev\cc1101-ps2\hal\src\hal_timer.c
+      1          #include "hal_timer.h"
+      2          #include "hal_hwdef.h"
+
+   \                                 In  segment DATA16_AN, at 0x160
+   \   union <unnamed> volatile _A_TACTL
+   \                     _A_TACTL:
+   \   000000                DS8 2
+
+   \                                 In  segment DATA16_AN, at 0x162
+   \   union <unnamed> volatile _A_TACCTL0
+   \                     _A_TACCTL0:
+   \   000000                DS8 2
+
+   \                                 In  segment DATA16_AN, at 0x172
+   \   unsigned short volatile TACCR0
+   \                     TACCR0:
+   \   000000                DS8 2
+
+   \                                 In  segment DATA16_AN, at 0x180
+   \   union <unnamed> volatile _A_TBCTL
+   \                     _A_TBCTL:
+   \   000000                DS8 2
+      3          
+
+   \                                 In  segment DATA16_Z, align 2, align-sorted
+   \   000000                REQUIRE ?cstart_init_zero
+      4          volatile unsigned long hal_timer_ticks = 0;
+   \                     hal_timer_ticks:
+   \   000000                DS8 4
+      5          
+
+   \                                 In  segment CODE, align 2
+      6          void hal_timer_init(void) {
+   \                     hal_timer_init:
+      7            /* initialize tick timer */
+      8            HAL_TIMER_REG_TAxCCR0 = 0; // stop the timer
+   \   000000   82437201     MOV.W   #0x0, &0x172
+      9            HAL_TIMER_REG_TAxCCTL0 |= CCIE; // enable compare/capture interrupt
+   \   000004   B2D010006201 BIS.W   #0x10, &0x162
+     10            HAL_TIMER_REG_TAxCTL = TASSEL_2 + ID_0 + MC_1; // select SMCLK, prescaler = 1, up mode
+   \   00000A   B24010026001 MOV.W   #0x210, &0x160
+     11            HAL_TIMER_REG_TAxCCR0 = (HAL_CLK_SMCLK / 1000) - 1; // set compare value so that the interrupt is triggered every 1ms
+   \   000010   B2403F1F7201 MOV.W   #0x1f3f, &0x172
+     12            
+     13            /* initialize microsecond delay timer */
+     14            HAL_TIMER_REG_TBxCTL = TBSSEL_2 + TBCLR; // select SMCLK, prescaler = 1, clear TBR (mode will be set when we use it)
+   \   000016   B24004028001 MOV.W   #0x204, &0x180
+     15            
+     16            __bis_SR_register(GIE); // enable interrupts
+   \   00001C   32D2         BIS.W   #0x8, SR
+     17          }
+   \   00001E   3041         RET
+   \   000020                REQUIRE TACCR0
+   \   000020                REQUIRE _A_TACCTL0
+   \   000020                REQUIRE _A_TACTL
+   \   000020                REQUIRE _A_TBCTL
+     18          
+     19          /* Timer_A capture/compare ISR */
+     20          #pragma vector = TIMER0_A0_VECTOR
+
+   \                                 In  segment CODE, align 2
+     21          __interrupt void hal_timer_ccr0_isr(void) {
+   \                     hal_timer_ccr0_isr:
+     22            hal_timer_ticks++;
+   \   000000   9253....     ADD.W   #0x1, &hal_timer_ticks
+   \   000004   8263....     ADDC.W  #0x0, &hal_timer_ticks + 2
+     23          }
+   \   000008   0013         RETI
+
+   \                                 In  segment INTVEC, offset 0xc, root
+   \                     `??hal_timer_ccr0_isr::??INTVEC 12`:
+   \   00000C   ....         DC16    hal_timer_ccr0_isr
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      4   hal_timer_ccr0_isr
+      2   hal_timer_init
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       2  TACCR0
+       2  _A_TACCTL0
+       2  _A_TACTL
+       2  _A_TBCTL
+      10  hal_timer_ccr0_isr
+       2  hal_timer_ccr0_isr::??INTVEC 12
+      32  hal_timer_init
+       4  hal_timer_ticks
+
+ 
+ 42 bytes in segment CODE
+  8 bytes in segment DATA16_AN
+  4 bytes in segment DATA16_Z
+  2 bytes in segment INTVEC
+ 
+ 42 bytes of CODE  memory
+  0 bytes of CONST memory (+ 2 bytes shared)
+  4 bytes of DATA  memory (+ 8 bytes shared)
+
+Errors: none
+Warnings: none

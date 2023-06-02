@@ -1,0 +1,8 @@
+Hardware abstraction layer (hal/):
+hal/include/hal.h: Header for including HAL libraries, included by main.h
+hal/src/hal_spi.c, hal/include/hal_spi.h: SPI interface library
+hal/include/hal_gpio.h: GPIO control helpers
+hal/include/hal_hwdef.h: Hardware configurations and definitions for the target architecture
+
+Source files:
+main.c, main.h: Main (operation) functions

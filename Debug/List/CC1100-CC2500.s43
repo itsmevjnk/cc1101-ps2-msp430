@@ -1,0 +1,1302 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// IAR C/C++ Compiler V6.40.1.950/W32 for MSP430          10/Sep/2022  00:10:07
+// Copyright 1996-2015 IAR Systems AB.
+// Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+//
+//    __rt_version  =  3
+//    __double_size =  32
+//    __reg_r4      =  free
+//    __reg_r5      =  free
+//    __pic         =  no
+//    __core        =  430
+//    Source file   =  D:\cc1101-ps2-itsmevjnk\lib\cc1101\src\CC1100-CC2500.c
+//    Command line  =  
+//        D:\cc1101-ps2-itsmevjnk\lib\cc1101\src\CC1100-CC2500.c -D HAL_HW_F149
+//        -lC D:\cc1101-ps2-itsmevjnk\Debug\List -lA
+//        D:\cc1101-ps2-itsmevjnk\Debug\List -o
+//        D:\cc1101-ps2-itsmevjnk\Debug\Obj --no_cse --no_unroll --no_inline
+//        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+//        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+//        7.3\430\lib\dlib\dl430fn.h" -I D:\cc1101-ps2-itsmevjnk\hal\include\
+//        -I D:\cc1101-ps2-itsmevjnk\hal\target\ -I
+//        D:\cc1101-ps2-itsmevjnk\lib\include\ -I
+//        D:\cc1101-ps2-itsmevjnk\lib\cc1101\include\ -Ol --multiplier=16
+//        --segment __data16=DATA16 --segment __data20=DATA20
+//    List file     =  D:\cc1101-ps2-itsmevjnk\Debug\List\CC1100-CC2500.s43
+//
+///////////////////////////////////////////////////////////////////////////////
+
+        NAME `CC1100-CC2500`
+
+        RTMODEL "__SystemLibrary", "DLib"
+        RTMODEL "__core", "430"
+        RTMODEL "__double_size", "32"
+        RTMODEL "__pic", "no"
+        RTMODEL "__reg_r4", "free"
+        RTMODEL "__reg_r5", "free"
+        RTMODEL "__rt_version", "3"
+
+        RSEG CSTACK:DATA:SORT:NOROOT(0)
+
+        EXTERN ?Epilogue3
+        EXTERN ?longjmp_r4
+        EXTERN ?longjmp_r5
+        EXTERN ?setjmp_r4
+        EXTERN ?setjmp_r5
+
+        PUBWEAK ?setjmp_save_r4
+        PUBWEAK ?setjmp_save_r5
+        PUBLIC RFReceivePacket
+        PUBLIC RFSendPacket
+        PUBWEAK _A_P2IFG
+        PUBWEAK _A_P2IN
+        PUBLIC writeRFSettings_315
+        PUBLIC writeRFSettings_433
+        PUBLIC writeRFSettings_868
+        PUBLIC writeRFSettings_915
+        
+          CFI Names cfiNames0
+          CFI StackFrame CFA SP DATA
+          CFI Resource PC:16, SP:16, SR:16, R4:16, R5:16, R6:16, R7:16, R8:16
+          CFI Resource R9:16, R10:16, R11:16, R12:16, R13:16, R14:16, R15:16
+          CFI EndNames cfiNames0
+        
+          CFI Common cfiCommon0 Using cfiNames0
+          CFI CodeAlign 2
+          CFI DataAlign 2
+          CFI ReturnAddress PC CODE
+          CFI CFA SP+2
+          CFI PC Frame(CFA, -2)
+          CFI SR Undefined
+          CFI R4 SameValue
+          CFI R5 SameValue
+          CFI R6 SameValue
+          CFI R7 SameValue
+          CFI R8 SameValue
+          CFI R9 SameValue
+          CFI R10 SameValue
+          CFI R11 SameValue
+          CFI R12 Undefined
+          CFI R13 Undefined
+          CFI R14 Undefined
+          CFI R15 Undefined
+          CFI EndCommon cfiCommon0
+        
+        EXTERN TI_CC_SPIWriteReg
+        EXTERN TI_CC_SPIWriteBurstReg
+        EXTERN TI_CC_SPIStrobe
+        EXTERN TI_CC_SPIReadStatus
+        EXTERN TI_CC_SPIReadReg
+        EXTERN TI_CC_SPIReadBurstReg
+
+// D:\cc1101-ps2-itsmevjnk\lib\cc1101\src\CC1100-CC2500.c
+//    1 /* --COPYRIGHT--,BSD
+//    2  * Copyright (c) 2011, Texas Instruments Incorporated
+//    3  * All rights reserved.
+//    4  *
+//    5  * Redistribution and use in source and binary forms, with or without
+//    6  * modification, are permitted provided that the following conditions
+//    7  * are met:
+//    8  *
+//    9  * *  Redistributions of source code must retain the above copyright
+//   10  *    notice, this list of conditions and the following disclaimer.
+//   11  *
+//   12  * *  Redistributions in binary form must reproduce the above copyright
+//   13  *    notice, this list of conditions and the following disclaimer in the
+//   14  *    documentation and/or other materials provided with the distribution.
+//   15  *
+//   16  * *  Neither the name of Texas Instruments Incorporated nor the names of
+//   17  *    its contributors may be used to endorse or promote products derived
+//   18  *    from this software without specific prior written permission.
+//   19  *
+//   20  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+//   21  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+//   22  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+//   23  * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+//   24  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+//   25  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+//   26  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+//   27  * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+//   28  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+//   29  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+//   30  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//   31  * --/COPYRIGHT--*/
+//   32 //------------------------------------------------------------------------------
+//   33 //  Description:  This file contains functions that configure the CC1100/2500
+//   34 //  device.
+//   35 //
+//   36 //  Demo Application for MSP430/CC1100-2500 Interface Code Library v1.0
+//   37 //
+//   38 //  K. Quiring
+//   39 //  Texas Instruments, Inc.
+//   40 //  July 2006
+//   41 //  IAR Embedded Workbench v3.41
+//   42 //------------------------------------------------------------------------------
+//   43 
+//   44 
+//   45 #include "cc1101.h"
+
+        ASEGN DATA16_AN:DATA:NOROOT,028H
+// union <unnamed> volatile _A_P2IN
+_A_P2IN:
+        DS8 1
+
+        ASEGN DATA16_AN:DATA:NOROOT,02bH
+// union <unnamed> volatile _A_P2IFG
+_A_P2IFG:
+        DS8 1
+//   46 #include "TI_CC_CC1100-CC2500.h"
+//   47 
+//   48 //#define TI_CC_RF_FREQ  868                 // 315, 433, 868, 915, 2400
+//   49 
+//   50 
+//   51 
+//   52 //------------------------------------------------------------------------------
+//   53 //  void writeRFSettings(void)
+//   54 //
+//   55 //  DESCRIPTION:
+//   56 //  Used to configure the CCxxxx registers.  There are five instances of this
+//   57 //  function, one for each available carrier frequency.  The instance compiled
+//   58 //  is chosen according to the system variable TI_CC_RF_FREQ, assigned within
+//   59 //  the header file "TI_CC_hardware_board.h".
+//   60 //
+//   61 //  ARGUMENTS:
+//   62 //      none
+//   63 //------------------------------------------------------------------------------
+//   64 
+//   65 
+//   66 //#if TI_CC_RF_FREQ == 315                          // 315 MHz
+//   67 // Product = CC1100
+//   68 // Crystal accuracy = 40 ppm
+//   69 // X-tal frequency = 26 MHz
+//   70 // RF output power = 0 dBm
+//   71 // RX filterbandwidth = 540.000000 kHz
+//   72 // Deviation = 0.000000
+//   73 // Return state:  Return to RX state upon leaving either TX or RX
+//   74 // Datarate = 250.000000 kbps
+//   75 // Modulation = (7) MSK
+//   76 // Manchester enable = (0) Manchester disabled
+//   77 // RF Frequency = 315.000000 MHz
+//   78 // Channel spacing = 199.951172 kHz
+//   79 // Channel number = 0
+//   80 // Optimization = Sensitivity
+//   81 // Sync mode = (3) 30/32 sync word bits detected
+//   82 // Format of RX/TX data = (0) Normal mode, use FIFOs for RX and TX
+//   83 // CRC operation = (1) CRC calculation in TX and CRC check in RX enabled
+//   84 // Forward Error Correction = (0) FEC disabled
+//   85 // Length configuration = (1) Variable length packets, packet length configured by the first received byte after sync word.
+//   86 // Packetlength = 255
+//   87 // Preamble count = (2)  4 bytes
+//   88 // Append status = 1
+//   89 // Address check = (1)  address check
+//   90 // FIFO autoflush = 0
+//   91 // Device address = 1
+//   92 // GDO0 signal selection = ( 6) Asserts when sync word has been sent / received, and de-asserts at the end of the packet
+//   93 // GDO2 signal selection = (11) Serial Clock
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//   94 void writeRFSettings_315(unsigned char channel)
+writeRFSettings_315:
+          CFI Block cfiBlock0 Using cfiCommon0
+          CFI Function writeRFSettings_315
+//   95 {
+        PUSH.W  R10
+          CFI R10 Frame(CFA, -4)
+          CFI CFA SP+4
+        MOV.B   R12, R10
+//   96     // Write register settings
+//   97     TI_CC_SPIWriteReg(TI_CCxxx0_IOCFG2,   0x0B); // GDO2 output pin config.
+        MOV.B   #0xb, R13
+        MOV.B   #0x0, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//   98     TI_CC_SPIWriteReg(TI_CCxxx0_IOCFG0,   0x06); // GDO0 output pin config.
+        MOV.B   #0x6, R13
+        MOV.B   #0x2, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//   99     TI_CC_SPIWriteReg(TI_CCxxx0_PKTLEN,   0xFF); // Packet length.
+        MOV.B   #0xff, R13
+        MOV.B   #0x6, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  100     TI_CC_SPIWriteReg(TI_CCxxx0_PKTCTRL1, 0x05); // Packet automation control.
+        MOV.B   #0x5, R13
+        MOV.B   #0x7, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  101     TI_CC_SPIWriteReg(TI_CCxxx0_PKTCTRL0, 0x05); // Packet automation control.
+        MOV.B   #0x5, R13
+        MOV.B   #0x8, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  102     TI_CC_SPIWriteReg(TI_CCxxx0_ADDR,     0x01); // Device address.
+        MOV.B   #0x1, R13
+        MOV.B   #0x9, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  103     TI_CC_SPIWriteReg(TI_CCxxx0_CHANNR,   channel); // Channel number.
+        MOV.B   R10, R13
+        MOV.B   #0xa, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  104     TI_CC_SPIWriteReg(TI_CCxxx0_FSCTRL1,  0x0B); // Freq synthesizer control.
+        MOV.B   #0xb, R13
+        MOV.B   #0xb, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  105     TI_CC_SPIWriteReg(TI_CCxxx0_FSCTRL0,  0x00); // Freq synthesizer control.
+        MOV.B   #0x0, R13
+        MOV.B   #0xc, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  106     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ2,    0x0C); // Freq control word, high byte
+        MOV.B   #0xc, R13
+        MOV.B   #0xd, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  107     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ1,    0x1D); // Freq control word, mid byte.
+        MOV.B   #0x1d, R13
+        MOV.B   #0xe, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  108     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ0,    0x89); // Freq control word, low byte.
+        MOV.B   #0x89, R13
+        MOV.B   #0xf, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  109     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG4,  0x2D); // Modem configuration.
+        MOV.B   #0x2d, R13
+        MOV.B   #0x10, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  110     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG3,  0x3B); // Modem configuration.
+        MOV.B   #0x3b, R13
+        MOV.B   #0x11, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  111     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG2,  0x73); // Modem configuration.
+        MOV.B   #0x73, R13
+        MOV.B   #0x12, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  112     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG1,  0x22); // Modem configuration.
+        MOV.B   #0x22, R13
+        MOV.B   #0x13, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  113     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG0,  0xF8); // Modem configuration.
+        MOV.B   #0xf8, R13
+        MOV.B   #0x14, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  114     TI_CC_SPIWriteReg(TI_CCxxx0_DEVIATN,  0x00); // Modem dev (when FSK mod en)
+        MOV.B   #0x0, R13
+        MOV.B   #0x15, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  115     TI_CC_SPIWriteReg(TI_CCxxx0_MCSM1 ,   0x3F); //MainRadio Cntrl State Machine
+        MOV.B   #0x3f, R13
+        MOV.B   #0x17, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  116     TI_CC_SPIWriteReg(TI_CCxxx0_MCSM0 ,   0x18); //MainRadio Cntrl State Machine
+        MOV.B   #0x18, R13
+        MOV.B   #0x18, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  117     TI_CC_SPIWriteReg(TI_CCxxx0_FOCCFG,   0x1D); // Freq Offset Compense. Config
+        MOV.B   #0x1d, R13
+        MOV.B   #0x19, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  118     TI_CC_SPIWriteReg(TI_CCxxx0_BSCFG,    0x1C); //  Bit synchronization config.
+        MOV.B   #0x1c, R13
+        MOV.B   #0x1a, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  119     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL2, 0xC7); // AGC control.
+        MOV.B   #0xc7, R13
+        MOV.B   #0x1b, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  120     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL1, 0x00); // AGC control.
+        MOV.B   #0x0, R13
+        MOV.B   #0x1c, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  121     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL0, 0xB2); // AGC control.
+        MOV.B   #0xb2, R13
+        MOV.B   #0x1d, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  122     TI_CC_SPIWriteReg(TI_CCxxx0_FREND1,   0xB6); // Front end RX configuration.
+        MOV.B   #0xb6, R13
+        MOV.B   #0x21, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  123     TI_CC_SPIWriteReg(TI_CCxxx0_FREND0,   0x10); // Front end RX configuration.
+        MOV.B   #0x10, R13
+        MOV.B   #0x22, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  124     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL3,   0xEA); // Frequency synthesizer cal.
+        MOV.B   #0xea, R13
+        MOV.B   #0x23, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  125     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL2,   0x0A); // Frequency synthesizer cal.
+        MOV.B   #0xa, R13
+        MOV.B   #0x24, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  126     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL1,   0x00); // Frequency synthesizer cal.
+        MOV.B   #0x0, R13
+        MOV.B   #0x25, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  127     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL0,   0x11); // Frequency synthesizer cal.
+        MOV.B   #0x11, R13
+        MOV.B   #0x26, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  128     TI_CC_SPIWriteReg(TI_CCxxx0_FSTEST,   0x59); // Frequency synthesizer cal.
+        MOV.B   #0x59, R13
+        MOV.B   #0x29, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  129     TI_CC_SPIWriteReg(TI_CCxxx0_TEST2,    0x88); // Various test settings.
+        MOV.B   #0x88, R13
+        MOV.B   #0x2c, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  130     TI_CC_SPIWriteReg(TI_CCxxx0_TEST1,    0x31); // Various test settings.
+        MOV.B   #0x31, R13
+        MOV.B   #0x2d, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  131     TI_CC_SPIWriteReg(TI_CCxxx0_TEST0,    0x0B); // Various test settings.
+        MOV.B   #0xb, R13
+        MOV.B   #0x2e, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  132     
+//  133     TI_CC_SPIWriteReg(TI_CCxxx0_PATABLE,  0x51); //PATABLE
+        MOV.B   #0x51, R13
+        MOV.B   #0x3e, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  134 }
+        POP.W   R10
+          CFI R10 SameValue
+          CFI CFA SP+2
+        RET
+          CFI EndBlock cfiBlock0
+//  135 
+//  136 // PATABLE (0 dBm output power)
+//  137 //extern char paTable315[] = {0x51};
+//  138 //extern char paTableLen = 1;
+//  139 
+//  140 
+//  141 
+//  142 
+//  143 //#if TI_CC_RF_FREQ == 433                          // 433 MHz
+//  144 // Product = CC1100
+//  145 // Crystal accuracy = 40 ppm
+//  146 // X-tal frequency = 26 MHz
+//  147 // RF output power = 0 dBm
+//  148 // RX filterbandwidth = 540.000000 kHz
+//  149 // Deviation = 0.000000
+//  150 // Return state:  Return to RX state upon leaving either TX or RX
+//  151 // Datarate = 250.000000 kbps
+//  152 // Modulation = (7) MSK
+//  153 // Manchester enable = (0) Manchester disabled
+//  154 // RF Frequency = 433.000000 MHz
+//  155 // Channel spacing = 199.951172 kHz
+//  156 // Channel number = 0
+//  157 // Optimization = Sensitivity
+//  158 // Sync mode = (3) 30/32 sync word bits detected
+//  159 // Format of RX/TX data = (0) Normal mode, use FIFOs for RX and TX
+//  160 // CRC operation = (1) CRC calculation in TX and CRC check in RX enabled
+//  161 // Forward Error Correction = (0) FEC disabled
+//  162 // Length configuration = (1) Variable length packets, packet length configured by the first received byte after sync word.
+//  163 // Packetlength = 255
+//  164 // Preamble count = (2)  4 bytes
+//  165 // Append status = 1
+//  166 // Address check = (0) No address check
+//  167 // FIFO autoflush = 0
+//  168 // Device address = 0
+//  169 // GDO0 signal selection = ( 6) Asserts when sync word has been sent / received, and de-asserts at the end of the packet
+//  170 // GDO2 signal selection = (11) Serial Clock
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//  171 void writeRFSettings_433(unsigned char channel)
+writeRFSettings_433:
+          CFI Block cfiBlock1 Using cfiCommon0
+          CFI Function writeRFSettings_433
+//  172 {
+        PUSH.W  R10
+          CFI R10 Frame(CFA, -4)
+          CFI CFA SP+4
+        MOV.B   R12, R10
+//  173     // Write register settings
+//  174     TI_CC_SPIWriteReg(TI_CCxxx0_IOCFG2,   0x0B); // GDO2 output pin config.
+        MOV.B   #0xb, R13
+        MOV.B   #0x0, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  175     TI_CC_SPIWriteReg(TI_CCxxx0_IOCFG0,   0x06); // GDO0 output pin config.
+        MOV.B   #0x6, R13
+        MOV.B   #0x2, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  176     TI_CC_SPIWriteReg(TI_CCxxx0_PKTLEN,   0xFF); // Packet length.
+        MOV.B   #0xff, R13
+        MOV.B   #0x6, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  177     TI_CC_SPIWriteReg(TI_CCxxx0_PKTCTRL1, 0x05); // Packet automation control.
+        MOV.B   #0x5, R13
+        MOV.B   #0x7, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  178     TI_CC_SPIWriteReg(TI_CCxxx0_PKTCTRL0, 0x05); // Packet automation control.
+        MOV.B   #0x5, R13
+        MOV.B   #0x8, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  179     TI_CC_SPIWriteReg(TI_CCxxx0_ADDR,     0x01); // Device address.
+        MOV.B   #0x1, R13
+        MOV.B   #0x9, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  180     TI_CC_SPIWriteReg(TI_CCxxx0_CHANNR,   channel); // Channel number.
+        MOV.B   R10, R13
+        MOV.B   #0xa, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  181     TI_CC_SPIWriteReg(TI_CCxxx0_FSCTRL1,  0x0B); // Freq synthesizer control.
+        MOV.B   #0xb, R13
+        MOV.B   #0xb, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  182     TI_CC_SPIWriteReg(TI_CCxxx0_FSCTRL0,  0x00); // Freq synthesizer control.
+        MOV.B   #0x0, R13
+        MOV.B   #0xc, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  183     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ2,    0x10); // Freq control word, high byte
+        MOV.B   #0x10, R13
+        MOV.B   #0xd, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  184     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ1,    0xA7); // Freq control word, mid byte.
+        MOV.B   #0xa7, R13
+        MOV.B   #0xe, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  185     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ0,    0x62); // Freq control word, low byte.
+        MOV.B   #0x62, R13
+        MOV.B   #0xf, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  186     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG4,  0x2D); // Modem configuration.
+        MOV.B   #0x2d, R13
+        MOV.B   #0x10, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  187     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG3,  0x3B); // Modem configuration.
+        MOV.B   #0x3b, R13
+        MOV.B   #0x11, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  188     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG2,  0x73); // Modem configuration.
+        MOV.B   #0x73, R13
+        MOV.B   #0x12, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  189     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG1,  0x22); // Modem configuration.
+        MOV.B   #0x22, R13
+        MOV.B   #0x13, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  190     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG0,  0xF8); // Modem configuration.
+        MOV.B   #0xf8, R13
+        MOV.B   #0x14, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  191     TI_CC_SPIWriteReg(TI_CCxxx0_DEVIATN,  0x00); // Modem dev (when FSK mod en)
+        MOV.B   #0x0, R13
+        MOV.B   #0x15, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  192     TI_CC_SPIWriteReg(TI_CCxxx0_MCSM1 ,   0x3F); //MainRadio Cntrl State Machine
+        MOV.B   #0x3f, R13
+        MOV.B   #0x17, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  193     TI_CC_SPIWriteReg(TI_CCxxx0_MCSM0 ,   0x18); //MainRadio Cntrl State Machine
+        MOV.B   #0x18, R13
+        MOV.B   #0x18, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  194     TI_CC_SPIWriteReg(TI_CCxxx0_FOCCFG,   0x1D); // Freq Offset Compens. Config
+        MOV.B   #0x1d, R13
+        MOV.B   #0x19, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  195     TI_CC_SPIWriteReg(TI_CCxxx0_BSCFG,    0x1C); //  Bit synchronization config.
+        MOV.B   #0x1c, R13
+        MOV.B   #0x1a, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  196     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL2, 0xC7); // AGC control.
+        MOV.B   #0xc7, R13
+        MOV.B   #0x1b, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  197     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL1, 0x00); // AGC control.
+        MOV.B   #0x0, R13
+        MOV.B   #0x1c, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  198     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL0, 0xB2); // AGC control.
+        MOV.B   #0xb2, R13
+        MOV.B   #0x1d, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  199     TI_CC_SPIWriteReg(TI_CCxxx0_FREND1,   0xB6); // Front end RX configuration.
+        MOV.B   #0xb6, R13
+        MOV.B   #0x21, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  200     TI_CC_SPIWriteReg(TI_CCxxx0_FREND0,   0x10); // Front end RX configuration.
+        MOV.B   #0x10, R13
+        MOV.B   #0x22, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  201     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL3,   0xEA); // Frequency synthesizer cal.
+        MOV.B   #0xea, R13
+        MOV.B   #0x23, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  202     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL2,   0x0A); // Frequency synthesizer cal.
+        MOV.B   #0xa, R13
+        MOV.B   #0x24, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  203     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL1,   0x00); // Frequency synthesizer cal.
+        MOV.B   #0x0, R13
+        MOV.B   #0x25, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  204     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL0,   0x11); // Frequency synthesizer cal.
+        MOV.B   #0x11, R13
+        MOV.B   #0x26, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  205     TI_CC_SPIWriteReg(TI_CCxxx0_FSTEST,   0x59); // Frequency synthesizer cal.
+        MOV.B   #0x59, R13
+        MOV.B   #0x29, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  206     TI_CC_SPIWriteReg(TI_CCxxx0_TEST2,    0x88); // Various test settings.
+        MOV.B   #0x88, R13
+        MOV.B   #0x2c, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  207     TI_CC_SPIWriteReg(TI_CCxxx0_TEST1,    0x31); // Various test settings.
+        MOV.B   #0x31, R13
+        MOV.B   #0x2d, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  208     TI_CC_SPIWriteReg(TI_CCxxx0_TEST0,    0x0B); // Various test settings.
+        MOV.B   #0xb, R13
+        MOV.B   #0x2e, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  209     
+//  210     TI_CC_SPIWriteReg(TI_CCxxx0_PATABLE,  0x51); //PATABLE
+        MOV.B   #0x51, R13
+        MOV.B   #0x3e, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  211 }
+        POP.W   R10
+          CFI R10 SameValue
+          CFI CFA SP+2
+        RET
+          CFI EndBlock cfiBlock1
+//  212 
+//  213 // PATABLE (0 dBm output power)
+//  214 //extern char paTable_433[] = {0x51};
+//  215 //extern char paTableLen = 1;
+//  216 
+//  217 
+//  218 
+//  219 //#if TI_CC_RF_FREQ == 868                          // 868 MHz
+//  220 // Product = CC1100
+//  221 // Crystal accuracy = 40 ppm
+//  222 // X-tal frequency = 26 MHz
+//  223 // RF output power = 0 dBm
+//  224 // RX filterbandwidth = 540.000000 kHz
+//  225 // Deviation = 0.000000
+//  226 // Return state:  Return to RX state upon leaving either TX or RX
+//  227 // Datarate = 250.000000 kbps
+//  228 // Modulation = (7) MSK
+//  229 // Manchester enable = (0) Manchester disabled
+//  230 // RF Frequency = 868.000000 MHz
+//  231 // Channel spacing = 199.951172 kHz
+//  232 // Channel number = 0
+//  233 // Optimization = Sensitivity
+//  234 // Sync mode = (3) 30/32 sync word bits detected
+//  235 // Format of RX/TX data = (0) Normal mode, use FIFOs for RX and TX
+//  236 // CRC operation = (1) CRC calculation in TX and CRC check in RX enabled
+//  237 // Forward Error Correction = (0) FEC disabled
+//  238 // Length configuration = (1) Variable length packets, packet length configured by the first received byte after sync word.
+//  239 // Packetlength = 255
+//  240 // Preamble count = (2)  4 bytes
+//  241 // Append status = 1
+//  242 // Address check = (0) No address check
+//  243 // FIFO autoflush = 0
+//  244 // Device address = 0
+//  245 // GDO0 signal selection = ( 6) Asserts when sync word has been sent / received, and de-asserts at the end of the packet
+//  246 // GDO2 signal selection = (11) Serial Clock
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//  247 void writeRFSettings_868(unsigned char channel)
+writeRFSettings_868:
+          CFI Block cfiBlock2 Using cfiCommon0
+          CFI Function writeRFSettings_868
+//  248 {
+        PUSH.W  R10
+          CFI R10 Frame(CFA, -4)
+          CFI CFA SP+4
+        MOV.B   R12, R10
+//  249     // Write register settings
+//  250     TI_CC_SPIWriteReg(TI_CCxxx0_IOCFG2,   0x0B); // GDO2 output pin config.
+        MOV.B   #0xb, R13
+        MOV.B   #0x0, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  251     TI_CC_SPIWriteReg(TI_CCxxx0_IOCFG0,   0x06); // GDO0 output pin config.
+        MOV.B   #0x6, R13
+        MOV.B   #0x2, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  252     TI_CC_SPIWriteReg(TI_CCxxx0_PKTLEN,   0xFF); // Packet length.
+        MOV.B   #0xff, R13
+        MOV.B   #0x6, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  253     TI_CC_SPIWriteReg(TI_CCxxx0_PKTCTRL1, 0x05); // Packet automation control.
+        MOV.B   #0x5, R13
+        MOV.B   #0x7, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  254     TI_CC_SPIWriteReg(TI_CCxxx0_PKTCTRL0, 0x05); // Packet automation control.
+        MOV.B   #0x5, R13
+        MOV.B   #0x8, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  255     TI_CC_SPIWriteReg(TI_CCxxx0_ADDR,     0x01); // Device address.
+        MOV.B   #0x1, R13
+        MOV.B   #0x9, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  256     TI_CC_SPIWriteReg(TI_CCxxx0_CHANNR,   channel); // Channel number.
+        MOV.B   R10, R13
+        MOV.B   #0xa, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  257     TI_CC_SPIWriteReg(TI_CCxxx0_FSCTRL1,  0x0B); // Freq synthesizer control.
+        MOV.B   #0xb, R13
+        MOV.B   #0xb, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  258     TI_CC_SPIWriteReg(TI_CCxxx0_FSCTRL0,  0x00); // Freq synthesizer control.
+        MOV.B   #0x0, R13
+        MOV.B   #0xc, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  259     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ2,    0x21); // Freq control word, high byte
+        MOV.B   #0x21, R13
+        MOV.B   #0xd, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  260     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ1,    0x62); // Freq control word, mid byte.
+        MOV.B   #0x62, R13
+        MOV.B   #0xe, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  261     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ0,    0x76); // Freq control word, low byte.
+        MOV.B   #0x76, R13
+        MOV.B   #0xf, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  262     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG4,  0x2D); // Modem configuration.
+        MOV.B   #0x2d, R13
+        MOV.B   #0x10, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  263     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG3,  0x3B); // Modem configuration.
+        MOV.B   #0x3b, R13
+        MOV.B   #0x11, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  264     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG2,  0x73); // Modem configuration.
+        MOV.B   #0x73, R13
+        MOV.B   #0x12, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  265     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG1,  0x22); // Modem configuration.
+        MOV.B   #0x22, R13
+        MOV.B   #0x13, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  266     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG0,  0xF8); // Modem configuration.
+        MOV.B   #0xf8, R13
+        MOV.B   #0x14, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  267     TI_CC_SPIWriteReg(TI_CCxxx0_DEVIATN,  0x00); // Modem dev (when FSK mod en)
+        MOV.B   #0x0, R13
+        MOV.B   #0x15, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  268     TI_CC_SPIWriteReg(TI_CCxxx0_MCSM1 ,   0x3F); //MainRadio Cntrl State Machine
+        MOV.B   #0x3f, R13
+        MOV.B   #0x17, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  269     TI_CC_SPIWriteReg(TI_CCxxx0_MCSM0 ,   0x18); //MainRadio Cntrl State Machine
+        MOV.B   #0x18, R13
+        MOV.B   #0x18, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  270     TI_CC_SPIWriteReg(TI_CCxxx0_FOCCFG,   0x1D); // Freq Offset Compens. Config
+        MOV.B   #0x1d, R13
+        MOV.B   #0x19, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  271     TI_CC_SPIWriteReg(TI_CCxxx0_BSCFG,    0x1C); //  Bit synchronization config.
+        MOV.B   #0x1c, R13
+        MOV.B   #0x1a, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  272     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL2, 0xC7); // AGC control.
+        MOV.B   #0xc7, R13
+        MOV.B   #0x1b, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  273     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL1, 0x00); // AGC control.
+        MOV.B   #0x0, R13
+        MOV.B   #0x1c, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  274     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL0, 0xB2); // AGC control.
+        MOV.B   #0xb2, R13
+        MOV.B   #0x1d, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  275     TI_CC_SPIWriteReg(TI_CCxxx0_FREND1,   0xB6); // Front end RX configuration.
+        MOV.B   #0xb6, R13
+        MOV.B   #0x21, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  276     TI_CC_SPIWriteReg(TI_CCxxx0_FREND0,   0x10); // Front end RX configuration.
+        MOV.B   #0x10, R13
+        MOV.B   #0x22, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  277     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL3,   0xEA); // Frequency synthesizer cal.
+        MOV.B   #0xea, R13
+        MOV.B   #0x23, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  278     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL2,   0x0A); // Frequency synthesizer cal.
+        MOV.B   #0xa, R13
+        MOV.B   #0x24, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  279     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL1,   0x00); // Frequency synthesizer cal.
+        MOV.B   #0x0, R13
+        MOV.B   #0x25, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  280     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL0,   0x11); // Frequency synthesizer cal.
+        MOV.B   #0x11, R13
+        MOV.B   #0x26, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  281     TI_CC_SPIWriteReg(TI_CCxxx0_FSTEST,   0x59); // Frequency synthesizer cal.
+        MOV.B   #0x59, R13
+        MOV.B   #0x29, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  282     TI_CC_SPIWriteReg(TI_CCxxx0_TEST2,    0x88); // Various test settings.
+        MOV.B   #0x88, R13
+        MOV.B   #0x2c, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  283     TI_CC_SPIWriteReg(TI_CCxxx0_TEST1,    0x31); // Various test settings.
+        MOV.B   #0x31, R13
+        MOV.B   #0x2d, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  284     TI_CC_SPIWriteReg(TI_CCxxx0_TEST0,    0x0B); // Various test settings.
+        MOV.B   #0xb, R13
+        MOV.B   #0x2e, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  285     
+//  286     TI_CC_SPIWriteReg(TI_CCxxx0_PATABLE,  0x60); //PATABLE
+        MOV.B   #0x60, R13
+        MOV.B   #0x3e, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  287 }
+        POP.W   R10
+          CFI R10 SameValue
+          CFI CFA SP+2
+        RET
+          CFI EndBlock cfiBlock2
+//  288 
+//  289 // PATABLE (0 dBm output power)
+//  290 //extern char paTable_868[] = {0x60};
+//  291 //extern char paTableLen = 1;
+//  292 
+//  293 
+//  294 
+//  295 
+//  296 //#if TI_CC_RF_FREQ == 915                          // 915 MHz
+//  297 // Product = CC1100
+//  298 // Crystal accuracy = 40 ppm
+//  299 // X-tal frequency = 26 MHz
+//  300 // RF output power = 0 dBm
+//  301 // RX filterbandwidth = 540.000000 kHz
+//  302 // Deviation = 0.000000
+//  303 // Return state:  Return to RX state upon leaving either TX or RX
+//  304 // Datarate = 250.000000 kbps
+//  305 // Modulation = (7) MSK
+//  306 // Manchester enable = (0) Manchester disabled
+//  307 // RF Frequency = 915.000000 MHz
+//  308 // Channel spacing = 199.951172 kHz
+//  309 // Channel number = 0
+//  310 // Optimization = Sensitivity
+//  311 // Sync mode = (3) 30/32 sync word bits detected
+//  312 // Format of RX/TX data = (0) Normal mode, use FIFOs for RX and TX
+//  313 // CRC operation = (1) CRC calculation in TX and CRC check in RX enabled
+//  314 // Forward Error Correction = (0) FEC disabled
+//  315 // Length configuration = (1) Variable length packets, packet length configured by the first received byte after sync word.
+//  316 // Packetlength = 255
+//  317 // Preamble count = (2)  4 bytes
+//  318 // Append status = 1
+//  319 // Address check = (0) No address check
+//  320 // FIFO autoflush = 0
+//  321 // Device address = 0
+//  322 // GDO0 signal selection = ( 6) Asserts when sync word has been sent / received, and de-asserts at the end of the packet
+//  323 // GDO2 signal selection = (11) Serial Clock
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//  324 void writeRFSettings_915(unsigned char channel)
+writeRFSettings_915:
+          CFI Block cfiBlock3 Using cfiCommon0
+          CFI Function writeRFSettings_915
+//  325 {
+        PUSH.W  R10
+          CFI R10 Frame(CFA, -4)
+          CFI CFA SP+4
+        MOV.B   R12, R10
+//  326     // Write register settings
+//  327     TI_CC_SPIWriteReg(TI_CCxxx0_IOCFG2,   0x0B); // GDO2 output pin config.
+        MOV.B   #0xb, R13
+        MOV.B   #0x0, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  328     TI_CC_SPIWriteReg(TI_CCxxx0_IOCFG0,   0x06); // GDO0 output pin config.
+        MOV.B   #0x6, R13
+        MOV.B   #0x2, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  329     TI_CC_SPIWriteReg(TI_CCxxx0_PKTLEN,   0xFF); // Packet length.
+        MOV.B   #0xff, R13
+        MOV.B   #0x6, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  330     TI_CC_SPIWriteReg(TI_CCxxx0_PKTCTRL1, 0x05); // Packet automation control.
+        MOV.B   #0x5, R13
+        MOV.B   #0x7, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  331     TI_CC_SPIWriteReg(TI_CCxxx0_PKTCTRL0, 0x05); // Packet automation control.
+        MOV.B   #0x5, R13
+        MOV.B   #0x8, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  332     TI_CC_SPIWriteReg(TI_CCxxx0_ADDR,     0x01); // Device address.
+        MOV.B   #0x1, R13
+        MOV.B   #0x9, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  333     TI_CC_SPIWriteReg(TI_CCxxx0_CHANNR,   (channel >> 2)); // Channel number.
+        CLRC
+        RRC.B   R10
+        RRA.B   R10
+        MOV.B   R10, R13
+        MOV.B   #0xa, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  334     TI_CC_SPIWriteReg(TI_CCxxx0_FSCTRL1,  0x0B); // Freq synthesizer control.
+        MOV.B   #0xb, R13
+        MOV.B   #0xb, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  335     TI_CC_SPIWriteReg(TI_CCxxx0_FSCTRL0,  0x00); // Freq synthesizer control.
+        MOV.B   #0x0, R13
+        MOV.B   #0xc, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  336     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ2,    0x23); // Freq control word, high byte
+        MOV.B   #0x23, R13
+        MOV.B   #0xd, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  337     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ1,    0x31); // Freq control word, mid byte.
+        MOV.B   #0x31, R13
+        MOV.B   #0xe, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  338     TI_CC_SPIWriteReg(TI_CCxxx0_FREQ0,    0x3B); // Freq control word, low byte.
+        MOV.B   #0x3b, R13
+        MOV.B   #0xf, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  339     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG4,  0x2D); // Modem configuration.
+        MOV.B   #0x2d, R13
+        MOV.B   #0x10, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  340     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG3,  0x3B); // Modem configuration.
+        MOV.B   #0x3b, R13
+        MOV.B   #0x11, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  341     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG2,  0x73); // Modem configuration.
+        MOV.B   #0x73, R13
+        MOV.B   #0x12, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  342     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG1,  0x22); // Modem configuration.
+        MOV.B   #0x22, R13
+        MOV.B   #0x13, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  343     TI_CC_SPIWriteReg(TI_CCxxx0_MDMCFG0,  0xF8); // Modem configuration.
+        MOV.B   #0xf8, R13
+        MOV.B   #0x14, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  344     TI_CC_SPIWriteReg(TI_CCxxx0_DEVIATN,  0x00); // Modem dev (when FSK mod en)
+        MOV.B   #0x0, R13
+        MOV.B   #0x15, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  345     TI_CC_SPIWriteReg(TI_CCxxx0_MCSM1 ,   0x3F); //MainRadio Cntrl State Machine
+        MOV.B   #0x3f, R13
+        MOV.B   #0x17, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  346     TI_CC_SPIWriteReg(TI_CCxxx0_MCSM0 ,   0x18); //MainRadio Cntrl State Machine
+        MOV.B   #0x18, R13
+        MOV.B   #0x18, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  347     TI_CC_SPIWriteReg(TI_CCxxx0_FOCCFG,   0x1D); // Freq Offset Compens. Config
+        MOV.B   #0x1d, R13
+        MOV.B   #0x19, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  348     TI_CC_SPIWriteReg(TI_CCxxx0_BSCFG,    0x1C); //  Bit synchronization config.
+        MOV.B   #0x1c, R13
+        MOV.B   #0x1a, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  349     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL2, 0xC7); // AGC control.
+        MOV.B   #0xc7, R13
+        MOV.B   #0x1b, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  350     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL1, 0x00); // AGC control.
+        MOV.B   #0x0, R13
+        MOV.B   #0x1c, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  351     TI_CC_SPIWriteReg(TI_CCxxx0_AGCCTRL0, 0xB2); // AGC control.
+        MOV.B   #0xb2, R13
+        MOV.B   #0x1d, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  352     TI_CC_SPIWriteReg(TI_CCxxx0_FREND1,   0xB6); // Front end RX configuration.
+        MOV.B   #0xb6, R13
+        MOV.B   #0x21, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  353     TI_CC_SPIWriteReg(TI_CCxxx0_FREND0,   0x10); // Front end RX configuration.
+        MOV.B   #0x10, R13
+        MOV.B   #0x22, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  354     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL3,   0xEA); // Frequency synthesizer cal.
+        MOV.B   #0xea, R13
+        MOV.B   #0x23, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  355     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL2,   0x0A); // Frequency synthesizer cal.
+        MOV.B   #0xa, R13
+        MOV.B   #0x24, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  356     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL1,   0x00); // Frequency synthesizer cal.
+        MOV.B   #0x0, R13
+        MOV.B   #0x25, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  357     TI_CC_SPIWriteReg(TI_CCxxx0_FSCAL0,   0x11); // Frequency synthesizer cal.
+        MOV.B   #0x11, R13
+        MOV.B   #0x26, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  358     TI_CC_SPIWriteReg(TI_CCxxx0_FSTEST,   0x59); // Frequency synthesizer cal.
+        MOV.B   #0x59, R13
+        MOV.B   #0x29, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  359     TI_CC_SPIWriteReg(TI_CCxxx0_TEST2,    0x88); // Various test settings.
+        MOV.B   #0x88, R13
+        MOV.B   #0x2c, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  360     TI_CC_SPIWriteReg(TI_CCxxx0_TEST1,    0x31); // Various test settings.
+        MOV.B   #0x31, R13
+        MOV.B   #0x2d, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  361     TI_CC_SPIWriteReg(TI_CCxxx0_TEST0,    0x0B); // Various test settings.    
+        MOV.B   #0xb, R13
+        MOV.B   #0x2e, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  362     //switch(channel & 0b11)
+//  363     TI_CC_SPIWriteReg(TI_CCxxx0_PATABLE,  0x50); //PATABLE
+        MOV.B   #0x50, R13
+        MOV.B   #0x3e, R12
+          CFI FunCall TI_CC_SPIWriteReg
+        CALL    #TI_CC_SPIWriteReg
+//  364 }
+        POP.W   R10
+          CFI R10 SameValue
+          CFI CFA SP+2
+        RET
+          CFI EndBlock cfiBlock3
+//  365 
+//  366 // PATABLE (0 dBm output power)
+//  367 //extern char paTable_915[] = {0x50};
+//  368 //extern char paTableLen = 1;
+//  369 
+//  370 
+//  371 
+//  372 
+//  373 //-----------------------------------------------------------------------------
+//  374 //  void RFSendPacket(char *txBuffer, char size)
+//  375 //
+//  376 //  DESCRIPTION:
+//  377 //  This function transmits a packet with length up to 63 bytes.  To use this
+//  378 //  function, GD00 must be configured to be asserted when sync word is sent and
+//  379 //  de-asserted at the end of the packet, which is accomplished by setting the
+//  380 //  IOCFG0 register to 0x06, per the CCxxxx datasheet.  GDO0 goes high at
+//  381 //  packet start and returns low when complete.  The function polls GDO0 to
+//  382 //  ensure packet completion before returning.
+//  383 //
+//  384 //  ARGUMENTS:
+//  385 //      char *txBuffer
+//  386 //          Pointer to a buffer containing the data to be transmitted
+//  387 //
+//  388 //      char size
+//  389 //          The size of the txBuffer
+//  390 //-----------------------------------------------------------------------------
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//  391 void RFSendPacket(char *txBuffer, char size)
+RFSendPacket:
+          CFI Block cfiBlock4 Using cfiCommon0
+          CFI Function RFSendPacket
+//  392 {
+//  393   TI_CC_SPIWriteBurstReg(TI_CCxxx0_TXFIFO, txBuffer, size); // Write TX data
+        MOV.B   R13, R14
+        MOV.W   R12, R13
+        MOV.B   #0x3f, R12
+          CFI FunCall TI_CC_SPIWriteBurstReg
+        CALL    #TI_CC_SPIWriteBurstReg
+//  394   TI_CC_SPIStrobe(TI_CCxxx0_STX);           // Change state to TX, initiating
+        MOV.B   #0x35, R12
+          CFI FunCall TI_CC_SPIStrobe
+        CALL    #TI_CC_SPIStrobe
+//  395                                             // data transfer
+//  396 
+//  397   while (!(TI_CC_GDO0_PxIN&TI_CC_GDO0_PIN));
+??RFSendPacket_0:
+        CMP.B   #0x0, &0x28
+        JGE     ??RFSendPacket_0
+//  398                                             // Wait GDO0 to go hi -> sync TX'ed
+//  399   while (TI_CC_GDO0_PxIN&TI_CC_GDO0_PIN);
+??RFSendPacket_1:
+        CMP.B   #0x0, &0x28
+        JL      ??RFSendPacket_1
+//  400                                             // Wait GDO0 to clear -> end of pkt
+//  401   TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // After pkt TX, this flag is set.
+        BIC.B   #0x80, &0x2b
+//  402                                             // Has to be cleared before existing
+//  403 }
+        RET
+          CFI EndBlock cfiBlock4
+        REQUIRE _A_P2IN
+        REQUIRE _A_P2IFG
+//  404 
+//  405 
+//  406 
+//  407 //-----------------------------------------------------------------------------
+//  408 //  char RFReceivePacket(char *rxBuffer, char *length)
+//  409 //
+//  410 //  DESCRIPTION:
+//  411 //  Receives a packet of variable length (first byte in the packet must be the
+//  412 //  length byte).  The packet length should not exceed the RXFIFO size.  To use
+//  413 //  this function, APPEND_STATUS in the PKTCTRL1 register must be enabled.  It
+//  414 //  is assumed that the function is called after it is known that a packet has
+//  415 //  been received; for example, in response to GDO0 going low when it is
+//  416 //  configured to output packet reception status.
+//  417 //
+//  418 //  The RXBYTES register is first read to ensure there are bytes in the FIFO.
+//  419 //  This is done because the GDO signal will go high even if the FIFO is flushed
+//  420 //  due to address filtering, CRC filtering, or packet length filtering.
+//  421 //
+//  422 //  ARGUMENTS:
+//  423 //      char *rxBuffer
+//  424 //          Pointer to the buffer where the incoming data should be stored
+//  425 //      char *length
+//  426 //          Pointer to a variable containing the size of the buffer where the
+//  427 //          incoming data should be stored. After this function returns, that
+//  428 //          variable holds the packet length.
+//  429 //
+//  430 //  RETURN VALUE:
+//  431 //      char
+//  432 //          0x80:  CRC OK
+//  433 //          0x00:  CRC NOT OK (or no pkt was put in the RXFIFO due to filtering)
+//  434 //-----------------------------------------------------------------------------
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+//  435 char RFReceivePacket(char *rxBuffer, char *length)
+RFReceivePacket:
+          CFI Block cfiBlock5 Using cfiCommon0
+          CFI Function RFReceivePacket
+//  436 {
+        PUSH.W  R10
+          CFI R10 Frame(CFA, -4)
+          CFI CFA SP+4
+        PUSH.W  R11
+          CFI R11 Frame(CFA, -6)
+          CFI CFA SP+6
+        PUSH.W  R8
+          CFI R8 Frame(CFA, -8)
+          CFI CFA SP+8
+        SUB.W   #0x2, SP
+          CFI CFA SP+10
+        MOV.W   R12, R10
+        MOV.W   R13, R11
+//  437   char status[2];
+//  438   char pktLen;
+//  439 
+//  440   if ((TI_CC_SPIReadStatus(TI_CCxxx0_RXBYTES) & TI_CCxxx0_NUM_RXBYTES))
+        MOV.B   #0x3b, R12
+          CFI FunCall TI_CC_SPIReadStatus
+        CALL    #TI_CC_SPIReadStatus
+        BIT.B   #0x7f, R12
+        JEQ     ??RFReceivePacket_0
+//  441   {
+//  442     pktLen = TI_CC_SPIReadReg(TI_CCxxx0_RXFIFO); // Read length byte
+        MOV.B   #0x3f, R12
+          CFI FunCall TI_CC_SPIReadReg
+        CALL    #TI_CC_SPIReadReg
+        MOV.B   R12, R8
+//  443 
+//  444     if (pktLen <= *length)                  // If pktLen size <= rxBuffer
+        CMP.B   R8, 0(R11)
+        JNC     ??RFReceivePacket_1
+//  445     {
+//  446       TI_CC_SPIReadBurstReg(TI_CCxxx0_RXFIFO, rxBuffer, pktLen); // Pull data
+        MOV.B   R8, R14
+        MOV.W   R10, R13
+        MOV.B   #0x3f, R12
+          CFI FunCall TI_CC_SPIReadBurstReg
+        CALL    #TI_CC_SPIReadBurstReg
+//  447       *length = pktLen;                     // Return the actual size
+        MOV.B   R8, 0(R11)
+//  448       TI_CC_SPIReadBurstReg(TI_CCxxx0_RXFIFO, status, 2);
+        MOV.B   #0x2, R14
+        MOV.W   SP, R13
+        MOV.B   #0x3f, R12
+          CFI FunCall TI_CC_SPIReadBurstReg
+        CALL    #TI_CC_SPIReadBurstReg
+//  449                                             // Read appended status bytes
+//  450       return (char)(status[TI_CCxxx0_LQI_RX]&TI_CCxxx0_CRC_OK);
+        MOV.B   0x1(SP), R12
+        AND.B   #0x80, R12
+        JMP     ??RFReceivePacket_2
+//  451     }                                       // Return CRC_OK bit
+//  452     else
+//  453     {
+//  454       *length = pktLen;                     // Return the large size
+??RFReceivePacket_1:
+        MOV.B   R8, 0(R11)
+//  455       TI_CC_SPIStrobe(TI_CCxxx0_SFRX);      // Flush RXFIFO
+        MOV.B   #0x3a, R12
+          CFI FunCall TI_CC_SPIStrobe
+        CALL    #TI_CC_SPIStrobe
+//  456       return 0;                             // Error
+        MOV.B   #0x0, R12
+        JMP     ??RFReceivePacket_2
+//  457     }
+//  458   }
+//  459   else
+//  460       return 0;                             // Error
+??RFReceivePacket_0:
+        MOV.B   #0x0, R12
+??RFReceivePacket_2:
+        ADD.W   #0x2, SP
+          CFI CFA SP+8
+          CFI FunCall ?Epilogue3
+        BR      #?Epilogue3
+//  461 }
+          CFI EndBlock cfiBlock5
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r4:
+        REQUIRE ?setjmp_r4
+        REQUIRE ?longjmp_r4
+
+        RSEG `CODE`:CODE:REORDER:NOROOT(1)
+?setjmp_save_r5:
+        REQUIRE ?setjmp_r5
+        REQUIRE ?longjmp_r5
+
+        END
+// 
+// 1 830 bytes in segment CODE
+//     2 bytes in segment DATA16_AN
+// 
+// 1 830 bytes of CODE memory
+//     0 bytes of DATA memory (+ 2 bytes shared)
+//
+//Errors: none
+//Warnings: 1

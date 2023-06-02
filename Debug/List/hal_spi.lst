@@ -1,0 +1,313 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V6.40.1.950/W32 for MSP430           10/Sep/2022  21:37:38
+# Copyright 1996-2015 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+#
+#    __rt_version  =  3
+#    __double_size =  32
+#    __reg_r4      =  free
+#    __reg_r5      =  free
+#    __pic         =  no
+#    __core        =  430
+#    Source file   =  Y:\Dev\cc1101-ps2\hal\src\hal_spi.c
+#    Command line  =  
+#        Y:\Dev\cc1101-ps2\hal\src\hal_spi.c -D HAL_HW_F149 -lC
+#        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+#        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+#        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+#        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+#        __data16=DATA16 --segment __data20=DATA20
+#    List file     =  Y:\Dev\cc1101-ps2\Debug\List\hal_spi.lst
+#    Object file   =  Y:\Dev\cc1101-ps2\Debug\Obj\hal_spi.r43
+#
+###############################################################################
+
+Y:\Dev\cc1101-ps2\hal\src\hal_spi.c
+      1          #include "hal_hwdef.h"
+
+   \                                 In  segment DATA16_AN, at 0x3
+   \   union <unnamed> volatile _A_IFG2
+   \                     _A_IFG2:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x5
+   \   union <unnamed> volatile _A_ME2
+   \                     _A_ME2:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x33
+   \   union <unnamed> volatile _A_P5SEL
+   \                     _A_P5SEL:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x78
+   \   union <unnamed> volatile _A_U1CTL
+   \                     _A_U1CTL:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x79
+   \   union <unnamed> volatile _A_U1TCTL
+   \                     _A_U1TCTL:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x7c
+   \   unsigned char volatile U1BR0
+   \                     U1BR0:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x7d
+   \   unsigned char volatile U1BR1
+   \                     U1BR1:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x7e
+   \   unsigned char const volatile U1RXBUF
+   \                     U1RXBUF:
+   \   000000                DS8 1
+
+   \                                 In  segment DATA16_AN, at 0x7f
+   \   unsigned char volatile U1TXBUF
+   \                     U1TXBUF:
+   \   000000                DS8 1
+      2          
+      3          #include "hal_spi.h"
+      4          #include "hal_gpio.h"
+      5          
+      6          /* low level functions */
+      7          #if defined HAL_SPI_INTERFACE_USART0 || defined HAL_SPI_INTERFACE_USART1
+
+   \                                 In  segment CODE, align 2
+      8          void hal_spi_init(void) {
+   \                     hal_spi_init:
+      9            HAL_SPI_REG_UxCTL = SWRST; // put USART peripheral in reset state
+   \   000000   D2437800     MOV.B   #0x1, &0x78
+     10            
+     11            /* general USART configuration */
+     12            HAL_SPI_REG_UxCTL |= CHAR + SYNC + MM; // USART master, SPI mode, 8-bit data length
+   \   000004   F2D016007800 BIS.B   #0x16, &0x78
+     13            HAL_SPI_REG_UxTCTL |= CKPH + CKPL + SSEL1 + SSEL0 + STC; // 3-pin SPI mode, using SMCLK as clock source, SPI mode 2
+   \   00000A   F2D0F2007900 BIS.B   #0xf2, &0x79
+     14            
+     15            /* baud rate setting: UxBR = BRCLK / baud */
+     16            HAL_SPI_REG_UxBR0 = (HAL_CLK_SMCLK / HAL_SPI_CLKSPEED) & 0xFF;
+   \   000010   F24020007C00 MOV.B   #0x20, &0x7c
+     17            HAL_SPI_REG_UxBR1 = (HAL_CLK_SMCLK / HAL_SPI_CLKSPEED) >> 8;
+   \   000016   C2437D00     MOV.B   #0x0, &0x7d
+     18            
+     19            HAL_SPI_REG_MEx |= HAL_SPI_BIT_USPIEx; // enable SPI peripheral
+   \   00001A   F2D010000500 BIS.B   #0x10, &0x5
+     20            
+     21            /* set up pins */
+     22            hal_gpio_func_peripheral(HAL_SPI_PORT_SIMO, HAL_SPI_PIN_SIMO);
+                   ^
+Warning[Pe1665]: concatenation with ";" in macro
+          "hal_gpio_func_peripheral_prep" does not create a valid token
+   \   000020   E2D33300     BIS.B   #0x2, &0x33
+     23            hal_gpio_func_peripheral(HAL_SPI_PORT_SOMI, HAL_SPI_PIN_SOMI);
+                   ^
+Warning[Pe1665]: concatenation with ";" in macro
+          "hal_gpio_func_peripheral_prep" does not create a valid token
+   \   000024   E2D23300     BIS.B   #0x4, &0x33
+     24            hal_gpio_func_peripheral(HAL_SPI_PORT_UCLK, HAL_SPI_PIN_UCLK);
+                   ^
+Warning[Pe1665]: concatenation with ";" in macro
+          "hal_gpio_func_peripheral_prep" does not create a valid token
+   \   000028   F2D23300     BIS.B   #0x8, &0x33
+     25            
+     26            HAL_SPI_REG_UxCTL &= ~SWRST; // disable reset state, essentially turning on the peripheral
+   \   00002C   D2C37800     BIC.B   #0x1, &0x78
+     27          }
+   \   000030   3041         RET
+   \   000032                REQUIRE _A_U1CTL
+   \   000032                REQUIRE _A_U1TCTL
+   \   000032                REQUIRE U1BR0
+   \   000032                REQUIRE U1BR1
+   \   000032                REQUIRE _A_ME2
+   \   000032                REQUIRE _A_P5SEL
+     28          
+     29          /* "building blocks" for interface functions */
+     30          #define HAL_SPI_WAIT_RXBUF              {while(!(HAL_SPI_REG_IFGx & HAL_SPI_BIT_URXIFGx));} // wait until there is a byte to receive
+     31          #define HAL_SPI_WAIT_TXBUF              {while(!(HAL_SPI_REG_IFGx & HAL_SPI_BIT_UTXIFGx));} // wait until the transmit buffer is ready to receive bytes
+     32          #define HAL_SPI_GET_RXBUF               HAL_SPI_REG_UxRXBUF // get a byte from receive buffer
+     33          #define HAL_SPI_SET_TXBUF(x)            {HAL_SPI_REG_UxTXBUF = (x);} // send a byte to transmit buffer and stage for transmission
+     34          
+     35          #else
+     36          #error "No SPI interface defined"
+     37          #endif
+     38          
+     39          /* high level interface functions */
+
+   \                                 In  segment CODE, align 2
+     40          unsigned char hal_spi_transfer(unsigned char txbyte) {
+   \                     hal_spi_transfer:
+   \   000000   0A12         PUSH.W  R10
+   \   000002   0B12         PUSH.W  R11
+   \   000004   0812         PUSH.W  R8
+   \   000006   0912         PUSH.W  R9
+     41            HAL_SPI_WAIT_TXBUF;
+   \                     ??hal_spi_transfer_0:
+   \   000008   F2B020000300 BIT.B   #0x20, &0x3
+   \   00000E   FC2B         JNC     ??hal_spi_transfer_0
+     42            HAL_SPI_SET_TXBUF(((txbyte & 1) << 7) | ((txbyte & 2) << 5) | ((txbyte & 4) << 3) | ((txbyte & 8) << 1) | ((txbyte & 16) >> 1) | ((txbyte & 32) >> 3) | ((txbyte & 64) >> 5) | ((txbyte & 128) >> 7)); // bit order swapping
+   \   000010   7CB08000     BIT.B   #0x80, R12
+   \   000014   4E7E         SUBC.B  R14, R14
+   \   000016   5E53         ADD.B   #0x1, R14
+   \   000018   4F4C         MOV.B   R12, R15
+   \   00001A   12C3         CLRC
+   \   00001C   4F10         RRC.B   R15
+   \   00001E   4F11         RRA.B   R15
+   \   000020   4F11         RRA.B   R15
+   \   000022   4F11         RRA.B   R15
+   \   000024   4F11         RRA.B   R15
+   \   000026   6FF3         AND.B   #0x2, R15
+   \   000028   4D4C         MOV.B   R12, R13
+   \   00002A   12C3         CLRC
+   \   00002C   4D10         RRC.B   R13
+   \   00002E   4D11         RRA.B   R13
+   \   000030   4D11         RRA.B   R13
+   \   000032   6DF2         AND.B   #0x4, R13
+   \   000034   4A4C         MOV.B   R12, R10
+   \   000036   12C3         CLRC
+   \   000038   4A10         RRC.B   R10
+   \   00003A   7AF2         AND.B   #0x8, R10
+   \   00003C   7CB2         BIT.B   #0x8, R12
+   \   00003E   4B7B         SUBC.B  R11, R11
+   \   000040   5B53         ADD.B   #0x1, R11
+   \   000042   4B5B         RLA.B   R11
+   \   000044   4B5B         RLA.B   R11
+   \   000046   4B5B         RLA.B   R11
+   \   000048   4B5B         RLA.B   R11
+   \   00004A   6CB2         BIT.B   #0x4, R12
+   \   00004C   4878         SUBC.B  R8, R8
+   \   00004E   5853         ADD.B   #0x1, R8
+   \   000050   4858         RLA.B   R8
+   \   000052   4858         RLA.B   R8
+   \   000054   4858         RLA.B   R8
+   \   000056   4858         RLA.B   R8
+   \   000058   4858         RLA.B   R8
+   \   00005A   6CB3         BIT.B   #0x2, R12
+   \   00005C   4979         SUBC.B  R9, R9
+   \   00005E   5953         ADD.B   #0x1, R9
+   \   000060   4959         RLA.B   R9
+   \   000062   4959         RLA.B   R9
+   \   000064   4959         RLA.B   R9
+   \   000066   4959         RLA.B   R9
+   \   000068   4959         RLA.B   R9
+   \   00006A   4959         RLA.B   R9
+   \   00006C   4C11         RRA.B   R12
+   \   00006E   4C43         MOV.B   #0x0, R12
+   \   000070   4C10         RRC.B   R12
+   \   000072   4CD9         BIS.B   R9, R12
+   \   000074   4CD8         BIS.B   R8, R12
+   \   000076   4CDB         BIS.B   R11, R12
+   \   000078   4CDA         BIS.B   R10, R12
+   \   00007A   4CDD         BIS.B   R13, R12
+   \   00007C   4CDF         BIS.B   R15, R12
+   \   00007E   4CDE         BIS.B   R14, R12
+   \   000080   C24C7F00     MOV.B   R12, &0x7f
+     43            HAL_SPI_WAIT_RXBUF; // there's no need to wait for transmission to finish as SPI is a duplex protocol, as soon as transmission is finish reception will finish too
+   \                     ??hal_spi_transfer_1:
+   \   000084   F2B010000300 BIT.B   #0x10, &0x3
+   \   00008A   FC2B         JNC     ??hal_spi_transfer_1
+     44            unsigned char rxbyte = HAL_SPI_GET_RXBUF;
+   \   00008C   5C427E00     MOV.B   &0x7e, R12
+     45            return (((rxbyte & 1) << 7) | ((rxbyte & 2) << 5) | ((rxbyte & 4) << 3) | ((rxbyte & 8) << 1) | ((rxbyte & 16) >> 1) | ((rxbyte & 32) >> 3) | ((rxbyte & 64) >> 5) | ((rxbyte & 128) >> 7));
+   \   000090   7CB08000     BIT.B   #0x80, R12
+   \   000094   4E7E         SUBC.B  R14, R14
+   \   000096   5E53         ADD.B   #0x1, R14
+   \   000098   4F4C         MOV.B   R12, R15
+   \   00009A   12C3         CLRC
+   \   00009C   4F10         RRC.B   R15
+   \   00009E   4F11         RRA.B   R15
+   \   0000A0   4F11         RRA.B   R15
+   \   0000A2   4F11         RRA.B   R15
+   \   0000A4   4F11         RRA.B   R15
+   \   0000A6   6FF3         AND.B   #0x2, R15
+   \   0000A8   4D4C         MOV.B   R12, R13
+   \   0000AA   12C3         CLRC
+   \   0000AC   4D10         RRC.B   R13
+   \   0000AE   4D11         RRA.B   R13
+   \   0000B0   4D11         RRA.B   R13
+   \   0000B2   6DF2         AND.B   #0x4, R13
+   \   0000B4   4A4C         MOV.B   R12, R10
+   \   0000B6   12C3         CLRC
+   \   0000B8   4A10         RRC.B   R10
+   \   0000BA   7AF2         AND.B   #0x8, R10
+   \   0000BC   7CB2         BIT.B   #0x8, R12
+   \   0000BE   4B7B         SUBC.B  R11, R11
+   \   0000C0   5B53         ADD.B   #0x1, R11
+   \   0000C2   4B5B         RLA.B   R11
+   \   0000C4   4B5B         RLA.B   R11
+   \   0000C6   4B5B         RLA.B   R11
+   \   0000C8   4B5B         RLA.B   R11
+   \   0000CA   6CB2         BIT.B   #0x4, R12
+   \   0000CC   4878         SUBC.B  R8, R8
+   \   0000CE   5853         ADD.B   #0x1, R8
+   \   0000D0   4858         RLA.B   R8
+   \   0000D2   4858         RLA.B   R8
+   \   0000D4   4858         RLA.B   R8
+   \   0000D6   4858         RLA.B   R8
+   \   0000D8   4858         RLA.B   R8
+   \   0000DA   6CB3         BIT.B   #0x2, R12
+   \   0000DC   4979         SUBC.B  R9, R9
+   \   0000DE   5953         ADD.B   #0x1, R9
+   \   0000E0   4959         RLA.B   R9
+   \   0000E2   4959         RLA.B   R9
+   \   0000E4   4959         RLA.B   R9
+   \   0000E6   4959         RLA.B   R9
+   \   0000E8   4959         RLA.B   R9
+   \   0000EA   4959         RLA.B   R9
+   \   0000EC   4C11         RRA.B   R12
+   \   0000EE   4C43         MOV.B   #0x0, R12
+   \   0000F0   4C10         RRC.B   R12
+   \   0000F2   4CD9         BIS.B   R9, R12
+   \   0000F4   4CD8         BIS.B   R8, R12
+   \   0000F6   4CDB         BIS.B   R11, R12
+   \   0000F8   4CDA         BIS.B   R10, R12
+   \   0000FA   4CDD         BIS.B   R13, R12
+   \   0000FC   4CDF         BIS.B   R15, R12
+   \   0000FE   4CDE         BIS.B   R14, R12
+   \   000100   3040....     BR      #?Epilogue4
+   \   000104                REQUIRE _A_IFG2
+   \   000104                REQUIRE U1TXBUF
+   \   000104                REQUIRE U1RXBUF
+     46          }
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      2   hal_spi_init
+     10   hal_spi_transfer
+       10 ?Epilogue4
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       1  U1BR0
+       1  U1BR1
+       1  U1RXBUF
+       1  U1TXBUF
+       1  _A_IFG2
+       1  _A_ME2
+       1  _A_P5SEL
+       1  _A_U1CTL
+       1  _A_U1TCTL
+      50  hal_spi_init
+     260  hal_spi_transfer
+
+ 
+ 310 bytes in segment CODE
+   9 bytes in segment DATA16_AN
+ 
+ 310 bytes of CODE memory
+   0 bytes of DATA memory (+ 9 bytes shared)
+
+Errors: none
+Warnings: 3

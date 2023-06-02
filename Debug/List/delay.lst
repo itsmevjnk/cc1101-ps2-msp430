@@ -1,0 +1,118 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V6.40.1.950/W32 for MSP430           10/Sep/2022  21:37:37
+# Copyright 1996-2015 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Texas Instruments MSP430
+#
+#    __rt_version  =  3
+#    __double_size =  32
+#    __reg_r4      =  free
+#    __reg_r5      =  free
+#    __pic         =  no
+#    __core        =  430
+#    Source file   =  Y:\Dev\cc1101-ps2\lib\src\delay.c
+#    Command line  =  
+#        Y:\Dev\cc1101-ps2\lib\src\delay.c -D HAL_HW_F149 -lC
+#        Y:\Dev\cc1101-ps2\Debug\List -lA Y:\Dev\cc1101-ps2\Debug\List -o
+#        Y:\Dev\cc1101-ps2\Debug\Obj --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --debug -D__MSP430F149__ -e --double=32
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\430\lib\dlib\dl430fn.h" -I Y:\Dev\cc1101-ps2\hal\include\ -I
+#        Y:\Dev\cc1101-ps2\hal\target\ -I Y:\Dev\cc1101-ps2\lib\include\ -I
+#        Y:\Dev\cc1101-ps2\lib\cc1101\include\ -Ol --multiplier=16 --segment
+#        __data16=DATA16 --segment __data20=DATA20
+#    List file     =  Y:\Dev\cc1101-ps2\Debug\List\delay.lst
+#    Object file   =  Y:\Dev\cc1101-ps2\Debug\Obj\delay.r43
+#
+###############################################################################
+
+Y:\Dev\cc1101-ps2\lib\src\delay.c
+      1          #include "delay.h"
+
+   \                                 In  segment DATA16_AN, at 0x180
+   \   union <unnamed> volatile _A_TBCTL
+   \                     _A_TBCTL:
+   \   000000                DS8 2
+
+   \                                 In  segment DATA16_AN, at 0x192
+   \   unsigned short volatile TBCCR0
+   \                     TBCCR0:
+   \   000000                DS8 2
+      2          #include "hal_timer.h"
+      3          #include "hal_hwdef.h"
+      4          
+
+   \                                 In  segment CODE, align 2
+      5          void delay_ms(unsigned int t) {
+   \                     delay_ms:
+   \   000000   0A12         PUSH.W  R10
+   \   000002   0B12         PUSH.W  R11
+      6            unsigned long t_start = hal_timer_ticks;
+   \   000004   1E42....     MOV.W   &hal_timer_ticks, R14
+   \   000008   1F42....     MOV.W   &hal_timer_ticks + 2, R15
+      7            while(hal_timer_ticks - t_start < t);
+   \                     ??delay_ms_0:
+   \   00000C   1A42....     MOV.W   &hal_timer_ticks, R10
+   \   000010   1B42....     MOV.W   &hal_timer_ticks + 2, R11
+   \   000014   0A8E         SUB.W   R14, R10
+   \   000016   0B7F         SUBC.W  R15, R11
+   \   000018   0D43         MOV.W   #0x0, R13
+   \   00001A   0B9D         CMP.W   R13, R11
+   \   00001C   F72B         JNC     ??delay_ms_0
+   \   00001E   0220         JNE     ??delay_ms_1
+   \   000020   0A9C         CMP.W   R12, R10
+   \   000022   F42B         JNC     ??delay_ms_0
+      8          }
+   \                     ??delay_ms_1:
+   \   000024   3B41         POP.W   R11
+   \   000026   3A41         POP.W   R10
+   \   000028   3041         RET
+      9          
+
+   \                                 In  segment CODE, align 2
+     10          void delay_us(unsigned int t) {
+   \                     delay_us:
+     11            HAL_TIMER_REG_TBxCCR0 = (HAL_CLK_SMCLK / 1000000) * t;
+   \   000000   0C5C         RLA.W   R12
+   \   000002   0C5C         RLA.W   R12
+   \   000004   0C5C         RLA.W   R12
+   \   000006   824C9201     MOV.W   R12, &0x192
+     12            HAL_TIMER_REG_TBxCTL |= MC_0; // up mode
+   \   00000A   924280018001 MOV.W   &0x180, &0x180
+     13            while(!(HAL_TIMER_REG_TBxCTL & TBIFG)); // wait until TBR = TBCL0
+   \                     ??delay_us_0:
+   \   000010   92B38001     BIT.W   #0x1, &0x180
+   \   000014   FD2B         JNC     ??delay_us_0
+     14            HAL_TIMER_REG_TBxCTL |= TBCLR; // reset, disabling Timer_B
+   \   000016   A2D28001     BIS.W   #0x4, &0x180
+     15          }
+   \   00001A   3041         RET
+   \   00001C                REQUIRE TBCCR0
+   \   00001C                REQUIRE _A_TBCTL
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      6   delay_ms
+      2   delay_us
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       2  TBCCR0
+       2  _A_TBCTL
+      42  delay_ms
+      28  delay_us
+
+ 
+ 70 bytes in segment CODE
+  4 bytes in segment DATA16_AN
+ 
+ 70 bytes of CODE memory
+  0 bytes of DATA memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
